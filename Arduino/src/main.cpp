@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <RingBuf.h>
+#include <ProtocolBuffer.hpp>
 #include <Adafruit_NeoPixel.h>
 #ifdef __AVR__
 #include <avr/power.h>
@@ -21,21 +22,8 @@ const bool SEND_SUCCESS = false;
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 
 RingBuf<byte, 500> ringBuffer;
+ProtocolBuffer<10, 5, 1, 2> buff;
 
-///////////////////////////
-// array[512] = buffer
-// // read
-// PROTO_LEN = NUMPIXELS * 3
-// INDEX = INDEX % 512
-// write byte in array at INDEX
-// when by == END_CHAR
-//   read ELEMENT at INDEX - PROTO_LEN + 1 (incl wrapping)
-//   when ELEMENT == START_CHAR
-//     take RESULT ranging from (INDEX - PROTO_LEN) until (INDEX - 1) (as loop) -> LED
-// INDEX + 1
-
-// | | | | | | | | | | | |
-// |5 6 E x x x x S 2 3 4|  -> 2 3 4 5 6 is the correct sequence
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Initialize
 void setup()
 {
@@ -119,7 +107,7 @@ void printRingBuffer()
   Serial.print("ring(");
   Serial.print(ringBuffer.size());
   Serial.print("): ");
-  for(uint16_t index = 0; index < ringBuffer.size(); index++) 
+  for (uint16_t index = 0; index < ringBuffer.size(); index++)
   {
     Serial.print(ringBuffer[index]);
     Serial.print(" ");
@@ -159,7 +147,7 @@ void processSerial()
   }
   // Serial.println("proceed");
   // check if there is somethig to read
-  if(!somethingToRead) 
+  if (!somethingToRead)
   {
     return;
   }
@@ -232,7 +220,7 @@ void processSerial()
     Serial.println(")");
   }
   // pop first elements
-  for(int index = 0; index <= startIndex; index++)
+  for (int index = 0; index <= startIndex; index++)
   {
     byte startCharByte;
     ringBuffer.pop(startCharByte);

@@ -8,5 +8,5 @@ TEST_CASE("The test factory")
     REQUIRE(2 == 2);
     REQUIRE(6 == 6);
 
-    ProtocolBuffer buf;
+    ProtocolBuffer<512, 127, 254, 255> buf;
 }
