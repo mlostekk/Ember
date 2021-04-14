@@ -8,5 +8,6 @@
         "chrono": "cpp",
         "variant": "cpp",
         "__locale": "cpp"
-    }
+    },
+    "cmake.configureOnOpen": false
 }

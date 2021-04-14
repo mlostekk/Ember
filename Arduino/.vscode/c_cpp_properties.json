@@ -10,7 +10,6 @@
             "includePath": [
                 "/Users/mlostek/Projects/nomad5/Ember/Arduino/include",
                 "/Users/mlostek/Projects/nomad5/Ember/Arduino/src",
-                "/Users/mlostek/Projects/nomad5/Ember/Arduino/.pio/libdeps/uno/RingBuffer/src",
                 "/Users/mlostek/Projects/nomad5/Ember/Arduino/.pio/libdeps/uno/Adafruit NeoPixel",
                 "/Users/mlostek/.platformio/packages/framework-arduino-avr/cores/arduino",
                 "/Users/mlostek/.platformio/packages/framework-arduino-avr/variants/standard",
@@ -27,7 +26,6 @@
                 "path": [
                     "/Users/mlostek/Projects/nomad5/Ember/Arduino/include",
                     "/Users/mlostek/Projects/nomad5/Ember/Arduino/src",
-                    "/Users/mlostek/Projects/nomad5/Ember/Arduino/.pio/libdeps/uno/RingBuffer/src",
                     "/Users/mlostek/Projects/nomad5/Ember/Arduino/.pio/libdeps/uno/Adafruit NeoPixel",
                     "/Users/mlostek/.platformio/packages/framework-arduino-avr/cores/arduino",
                     "/Users/mlostek/.platformio/packages/framework-arduino-avr/variants/standard",
@@ -55,7 +53,8 @@
             "compilerArgs": [
                 "-mmcu=atmega328p",
                 ""
-            ]
+            ],
+            "configurationProvider": "ms-vscode.cmake-tools"
         }
     ],
     "version": 4
