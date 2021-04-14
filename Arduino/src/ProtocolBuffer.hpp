@@ -47,12 +47,12 @@ class ProtocolBuffer
 
 private:
     byte buffer[S];
-    uint16_t writeIndex;
+    int writeIndex;
 
 public:
     /// Constructor
     ProtocolBuffer();
-    /// Write one byte, return true if this byte was an 
+    /// Write one byte, return true if this byte was an
     /// protocol end byte and going back the protocol length
     /// found a start byte
     bool putByte(const byte element);
@@ -62,14 +62,24 @@ public:
 
 /// Construction
 template <size_t S, size_t PL, byte PS, byte PE>
-ProtocolBuffer<S, PL, PS, PE>::ProtocolBuffer() : writeIndex(0)
+ProtocolBuffer<S, PL, PS, PE>::ProtocolBuffer() : writeIndex(-1)
 {
+    for (int index = 0; index < S; index++)
+    {
+        buffer[index] = 0;
+    }
 }
 
 /// Put byte
 template <size_t S, size_t PL, byte PS, byte PE>
 bool ProtocolBuffer<S, PL, PS, PE>::putByte(const byte element)
 {
+    writeIndex = (writeIndex + 1) % S;
+    buffer[writeIndex] = element;
+    if (element == PE)
+    {
+        return true;
+    }
     return false;
 }
 
@@ -77,6 +87,27 @@ bool ProtocolBuffer<S, PL, PS, PE>::putByte(const byte element)
 template <size_t S, size_t PL, byte PS, byte PE>
 typename ProtocolBuffer<S, PL, PS, PE>::Protocol ProtocolBuffer<S, PL, PS, PE>::getProtocolChunk()
 {
-    return {};
+    // return chunk
+    Protocol protocol = {};
+    // early exit
+    if (buffer[writeIndex] != PE)
+    {
+        for (int index = 0; index < PL; index++)
+        {
+            protocol.buffer[index] = 0;
+        }
+        return protocol;
+    }
+    // regular processing
+    for (int index = 0; index < PL; index++)
+    {
+        int readIndex = writeIndex - PL + index;
+        if (readIndex < 0)
+        {
+            readIndex = S + readIndex;
+        }
+        protocol.buffer[index] = buffer[readIndex];
+    }
+    return protocol;
 }
 #endif /* __ProtocolBuffer_H__ */
