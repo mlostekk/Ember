@@ -31,6 +31,7 @@ class ProtocolBuffer
 {
     struct Protocol
     {
+        size_t size;
         byte buffer[PL];
     };
 
@@ -64,7 +65,7 @@ public:
 template <size_t S, size_t PL, byte PS, byte PE>
 ProtocolBuffer<S, PL, PS, PE>::ProtocolBuffer() : writeIndex(-1)
 {
-    for (int index = 0; index < S; index++)
+    for (uint16_t index = 0; index < S; index++)
     {
         buffer[index] = 0;
     }
@@ -88,18 +89,18 @@ template <size_t S, size_t PL, byte PS, byte PE>
 typename ProtocolBuffer<S, PL, PS, PE>::Protocol ProtocolBuffer<S, PL, PS, PE>::getProtocolChunk()
 {
     // return chunk
-    Protocol protocol = {};
+    Protocol protocol = { PL, {}};
     // early exit
     if (buffer[writeIndex] != PE)
     {
-        for (int index = 0; index < PL; index++)
+        for (uint16_t index = 0; index < PL; index++)
         {
             protocol.buffer[index] = 0;
         }
         return protocol;
     }
     // regular processing
-    for (int index = 0; index < PL; index++)
+    for (uint16_t index = 0; index < PL; index++)
     {
         int readIndex = writeIndex - PL + index;
         if (readIndex < 0)
@@ -110,4 +111,5 @@ typename ProtocolBuffer<S, PL, PS, PE>::Protocol ProtocolBuffer<S, PL, PS, PE>::
     }
     return protocol;
 }
+
 #endif /* __ProtocolBuffer_H__ */
