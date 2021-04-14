@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "algorithm": "cpp",
+        "deque": "cpp",
+        "functional": "cpp",
+        "memory": "cpp",
+        "streambuf": "cpp",
+        "chrono": "cpp",
+        "variant": "cpp",
+        "__locale": "cpp"
+    }
+}
