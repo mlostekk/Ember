@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include <RingBuf.h>
 #include <ProtocolBuffer.hpp>
 #include <Adafruit_NeoPixel.h>
 #ifdef __AVR__
@@ -14,6 +13,7 @@ const byte PROTOCOL_END_CHAR = 255;
 const int PIN = 8;
 const int NUMPIXELS = 124; // 45 + 17 + 45 + 17
 const bool SEND_DEBUG = true;
+const bool SEND_ERROR = true;
 const bool SEND_VERBOSE = false;
 const bool SEND_INDEX_ERROR = true;
 const bool SEND_SUCCESS = false;
@@ -21,8 +21,7 @@ const bool SEND_SUCCESS = false;
 /// The neopixel instance
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 
-RingBuf<byte, 500> ringBuffer;
-ProtocolBuffer<10, 5, 1, 2> buff;
+ProtocolBuffer<500, NUMPIXELS * 3, PROTOCOL_START_CHAR, PROTOCOL_END_CHAR> protocolBuffer;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Initialize
 void setup()
@@ -43,7 +42,7 @@ void setLeds(byte imageData[], uint16_t count)
   // wrong amount?
   if (count != NUMPIXELS * 3)
   {
-    if (SEND_DEBUG)
+    if (SEND_ERROR)
     {
       Serial.print("wrong number of elements given (");
       Serial.print(count);
@@ -97,25 +96,6 @@ void printArray(byte array[], uint16_t count)
   Serial.flush();
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// PRINT RING
-void printRingBuffer()
-{
-  if (!SEND_VERBOSE)
-  {
-    return;
-  }
-  Serial.print("ring(");
-  Serial.print(ringBuffer.size());
-  Serial.print("): ");
-  for (uint16_t index = 0; index < ringBuffer.size(); index++)
-  {
-    Serial.print(ringBuffer[index]);
-    Serial.print(" ");
-  }
-  Serial.println(" ");
-  Serial.flush();
-}
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// SERIAL PROCESSING
 void processSerial()
 {
@@ -128,126 +108,23 @@ void processSerial()
     }
   }
   // read all data to ring buffer
-  bool somethingToRead = false;
+  bool endSignal = false;
   while (Serial.available() > 0)
   {
-    somethingToRead = true;
     byte incoming = Serial.read();
     printNum("incoming: %i", incoming);
-    auto success = ringBuffer.push(incoming);
-    if (!success)
-    {
-      if (SEND_DEBUG)
-      {
-        Serial.println("ERROR PUTTING RING BUFFER");
-      }
-      ringBuffer.clear();
-    }
-    printRingBuffer();
+    endSignal = protocolBuffer.putByte(incoming);
   }
-  // Serial.println("proceed");
   // check if there is somethig to read
-  if (!somethingToRead)
+  if (!endSignal)
   {
     return;
   }
-  // check if ring buffer is full
-  if (ringBuffer.isFull())
-  {
-    if (SEND_DEBUG)
-    {
-      Serial.println("ringbuffer is full, dropping last");
-    }
-    byte last;
-    ringBuffer.pop(last);
-  }
-  // try to find a PROTOCOL_END_CHAR
-  int startIndex = -1;
-  int endIndex = -1;
-  for (uint16_t index = 0; index < ringBuffer.size(); index++)
-  {
-    if (ringBuffer[index] == PROTOCOL_START_CHAR)
-    {
-      startIndex = index;
-      if (endIndex > 0)
-      {
-        break;
-      }
-    }
-    if (ringBuffer[index] == PROTOCOL_END_CHAR)
-    {
-      endIndex = index;
-      if (startIndex > 0)
-      {
-        break;
-      }
-    }
-  }
-  // no end index
-  if (endIndex < 0)
-  {
-    return;
-  }
-
-  // start index behind end index?
-  if (startIndex >= endIndex)
-  {
-    if (SEND_INDEX_ERROR)
-    {
-      Serial.println("start index behind end index, purging");
-    }
-    ringBuffer.clear();
-    return;
-  }
-  // end index found
-  if (endIndex >= 0 && startIndex < 0)
-  {
-    if (SEND_INDEX_ERROR)
-    {
-      Serial.println("end index without start index, purging");
-    }
-    ringBuffer.clear();
-    return;
-  }
-
-  // check if the amount of bytes is correct
-  if (SEND_SUCCESS)
-  {
-    Serial.print("protocol chars found found (");
-    Serial.print(startIndex);
-    Serial.print(" / ");
-    Serial.print(endIndex);
-    Serial.println(")");
-  }
-  // pop first elements
-  for (int index = 0; index <= startIndex; index++)
-  {
-    byte startCharByte;
-    ringBuffer.pop(startCharByte);
-  }
-  // process elements
-  uint16_t range = (endIndex - startIndex) - 1;
-  byte element[range];
-  for (uint16_t idx = 0; idx < range; idx++)
-  {
-    ringBuffer.pop(element[idx]);
-  }
-  // pop last element
-  byte endCharByte;
-  ringBuffer.pop(endCharByte);
-  // print
-  printArray(element, range);
-  printRingBuffer();
-
-  if (SEND_SUCCESS)
-  {
-    Serial.print("chunk lengh: ");
-    Serial.println(range);
-  }
-  Serial.flush();
+  // get the led buffer
+  auto ledBuffer = protocolBuffer.getProtocolChunk().buffer;
 
   // set leds
-  setLeds(element, range);
+  setLeds(ledBuffer, NUMPIXELS * 3);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 3BYTE
