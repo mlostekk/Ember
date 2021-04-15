@@ -59,39 +59,57 @@ public:
     bool putByte(const byte element);
     /// Get the current protocol chunk
     Protocol getProtocolChunk();
+    /// Purge the whole buffer
+    void purge();
 };
 
 /// Construction
 template <size_t S, size_t PL, byte PS, byte PE>
-ProtocolBuffer<S, PL, PS, PE>::ProtocolBuffer() : writeIndex(-1)
+ProtocolBuffer<S, PL, PS, PE>::ProtocolBuffer()
 {
-    for (uint16_t index = 0; index < S; index++)
-    {
-        buffer[index] = 0;
-    }
+    purge();
 }
 
 /// Put byte
 template <size_t S, size_t PL, byte PS, byte PE>
 bool ProtocolBuffer<S, PL, PS, PE>::putByte(const byte element)
 {
-    writeIndex = (writeIndex + 1) % S;
+    // 1. start element
+    if (element == PS)
+    {
+        purge();
+    }
+    // 2. increment index and save new element
     buffer[writeIndex] = element;
+    writeIndex = (writeIndex + 1) % S;
+    // 3. end elmeent?
     if (element == PE)
     {
-        return true;
+        // check here if there is a valid start element
+        int expectedStart = (writeIndex - 2 - PL);
+        if (expectedStart < 0)
+        {
+            expectedStart += S;
+        }
+        if (buffer[expectedStart] == PS)
+        {
+            return true;
+        }
+        purge();
+        return false;
     }
     return false;
 }
 
-/// Construction
+/// Get the current protocol chunk
 template <size_t S, size_t PL, byte PS, byte PE>
 typename ProtocolBuffer<S, PL, PS, PE>::Protocol ProtocolBuffer<S, PL, PS, PE>::getProtocolChunk()
 {
     // return chunk
-    Protocol protocol = { PL, {}};
+    Protocol protocol = {PL, {}};
     // early exit
-    if (buffer[writeIndex] != PE)
+    int readIndex = (writeIndex - 1) % S;
+    if (buffer[readIndex] != PE)
     {
         for (uint16_t index = 0; index < PL; index++)
         {
@@ -102,14 +120,25 @@ typename ProtocolBuffer<S, PL, PS, PE>::Protocol ProtocolBuffer<S, PL, PS, PE>::
     // regular processing
     for (uint16_t index = 0; index < PL; index++)
     {
-        int readIndex = writeIndex - PL + index;
-        if (readIndex < 0)
+        int fetchIndex = readIndex - PL + index;
+        if (fetchIndex < 0)
         {
-            readIndex = S + readIndex;
+            fetchIndex = S + fetchIndex;
         }
-        protocol.buffer[index] = buffer[readIndex];
+        protocol.buffer[index] = buffer[fetchIndex];
     }
     return protocol;
+}
+
+/// Purging
+template <size_t S, size_t PL, byte PS, byte PE>
+void ProtocolBuffer<S, PL, PS, PE>::purge()
+{
+    writeIndex = 0;
+    for (uint16_t index = 0; index < S; index++)
+    {
+        buffer[index] = 0;
+    }
 }
 
 #endif /* __ProtocolBuffer_H__ */

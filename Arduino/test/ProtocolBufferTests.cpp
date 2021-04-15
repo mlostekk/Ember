@@ -168,10 +168,10 @@ SCENARIO("ProtocolBuffer tests")
             }
         }
 
-        //  idx: |   0	 1	 2	 3	 4	 5	 6	 7	 8
-        // ------┼--------------------------------------
-        //  val: |   3	PE	10	11 	12	13	PS	 1	 2
-        WHEN("Filling the sequence 10 11 254 1 2 3 255 12 13, the correct result needs to be found")
+        //  idx: |   0	 1	 2	 3	 4	 5	 6	 7	 8   9  10  11 
+        // ------┼-------------------------------------------------
+        //  val: |  99  99  99   3	PE	10	11 	12	13	PS	 1	 2
+        WHEN("Filling the sequence 99 99 99 10 11 254 1 2 3 255 12 13, the correct result needs to be found")
         {
             TestValue values[] = {
                 {99, false, INVALID_PROTOCOL}, // dummy
@@ -188,6 +188,40 @@ SCENARIO("ProtocolBuffer tests")
                 {PE, true, {1, 2, 3}},
             };
             for (int index = 0; index < 12; index++)
+            {
+                TestValue value = values[index];
+                bool endSignal = buffer.putByte(value.value);
+                REQUIRE(endSignal == value.endSignal);
+                auto resultProtocol = buffer.getProtocolChunk();
+                REQUIRE(resultProtocol.buffer[0] == value.protocol[0]);
+                REQUIRE(resultProtocol.buffer[1] == value.protocol[1]);
+                REQUIRE(resultProtocol.buffer[2] == value.protocol[2]);
+            }
+        }
+
+        //  idx: |   0	 1	 2	 3	 4	 5	 6	 7	 8
+        // ------┼--------------------------------------
+        //  val: |  11	12	PS	1 	PS	 2	PE	 3	 PE
+        WHEN("Filling the sequence 11 12 PS 1 PS 2 PE 3 PE, the correct result needs to be found")
+        {
+            TestValue values[] = {
+                {11, false, INVALID_PROTOCOL},
+                {12, false, INVALID_PROTOCOL},
+                {PS, false, INVALID_PROTOCOL}, // -> purge
+                {1, false, INVALID_PROTOCOL},
+                {PS, false, INVALID_PROTOCOL}, // -> purge
+                {2, false, INVALID_PROTOCOL},
+                {PE, false, INVALID_PROTOCOL}, // -> purge
+                {3, false, INVALID_PROTOCOL},
+                {PE, false, INVALID_PROTOCOL}, // -> purge
+                {13, false, INVALID_PROTOCOL},
+                {PS, false, INVALID_PROTOCOL},
+                {4, false, INVALID_PROTOCOL},
+                {5, false, INVALID_PROTOCOL},
+                {6, false, INVALID_PROTOCOL},
+                {PE, true, {4, 5, 6}},
+            };
+            for (int index = 0; index < 15; index++)
             {
                 TestValue value = values[index];
                 bool endSignal = buffer.putByte(value.value);
