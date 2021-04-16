@@ -108,20 +108,20 @@ void processSerial()
     }
   }
   // read all data to ring buffer
-  bool endSignal = false;
+  bool bufferWritten = false;
   while (Serial.available() > 0)
   {
     byte incoming = Serial.read();
     printNum("incoming: %i", incoming);
-    endSignal = protocolBuffer.putByte(incoming);
-    if (endSignal)
+    if (protocolBuffer.putByte(incoming))
     {
-    // get the led buffer
-    auto ledBuffer = protocolBuffer.getProtocolChunk().buffer;
+      // get the led buffer
+      auto ledBuffer = protocolBuffer.getProtocolChunk().buffer;
+      bufferWritten = true;
     }
   }
   // check if there is somethig to read
-  if (!endSignal)
+  if (!bufferWritten)
   {
     return;
   }
