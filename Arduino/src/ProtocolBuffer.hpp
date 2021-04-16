@@ -49,6 +49,7 @@ class ProtocolBuffer
 private:
     byte buffer[S];
     int writeIndex;
+    int startIndex; //last found PS
 
 public:
     /// Constructor
@@ -77,7 +78,7 @@ bool ProtocolBuffer<S, PL, PS, PE>::putByte(const byte element)
     // 1. start element
     if (element == PS)
     {
-        purge();
+        startIndex = writeIndex;
     }
     // 2. increment index and save new element
     buffer[writeIndex] = element;
@@ -91,11 +92,12 @@ bool ProtocolBuffer<S, PL, PS, PE>::putByte(const byte element)
         {
             expectedStart += S;
         }
-        if (buffer[expectedStart] == PS)
+        if (expectedStart == startIndex)
         {
             return true;
         }
-        purge();
+        //forget last found PS
+        startIndex = -1;
         return false;
     }
     return false;
@@ -107,25 +109,33 @@ typename ProtocolBuffer<S, PL, PS, PE>::Protocol ProtocolBuffer<S, PL, PS, PE>::
 {
     // return chunk
     Protocol protocol = {PL, {}};
-    // early exit
+
     int readIndex = (writeIndex - 1) % S;
-    if (buffer[readIndex] != PE)
+    int expectedStart = (readIndex - 1 - PL);
+    if (expectedStart < 0)
     {
+        expectedStart += S;
+    }
+    //is the last Protocol-start and Protocol-end at the expected position
+    if (buffer[readIndex] == PE && expectedStart == startIndex)
+    {
+        // regular processing
+        for (uint16_t index = 0; index < PL; index++)
+        {
+            int fetchIndex = readIndex - PL + index;
+            if (fetchIndex < 0)
+            {
+                fetchIndex = S + fetchIndex;
+            }
+            protocol.buffer[index] = buffer[fetchIndex];
+        }
+        //forget last found PS
+        startIndex = -1;
+    } else {
         for (uint16_t index = 0; index < PL; index++)
         {
             protocol.buffer[index] = 0;
         }
-        return protocol;
-    }
-    // regular processing
-    for (uint16_t index = 0; index < PL; index++)
-    {
-        int fetchIndex = readIndex - PL + index;
-        if (fetchIndex < 0)
-        {
-            fetchIndex = S + fetchIndex;
-        }
-        protocol.buffer[index] = buffer[fetchIndex];
     }
     return protocol;
 }
@@ -135,6 +145,7 @@ template <size_t S, size_t PL, byte PS, byte PE>
 void ProtocolBuffer<S, PL, PS, PE>::purge()
 {
     writeIndex = 0;
+    startIndex = -1;
     for (uint16_t index = 0; index < S; index++)
     {
         buffer[index] = 0;
