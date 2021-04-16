@@ -114,14 +114,17 @@ void processSerial()
     byte incoming = Serial.read();
     printNum("incoming: %i", incoming);
     endSignal = protocolBuffer.putByte(incoming);
+    if (endSignal)
+    {
+    // get the led buffer
+    auto ledBuffer = protocolBuffer.getProtocolChunk().buffer;
+    }
   }
   // check if there is somethig to read
   if (!endSignal)
   {
     return;
   }
-  // get the led buffer
-  auto ledBuffer = protocolBuffer.getProtocolChunk().buffer;
 
   // set leds
   setLeds(ledBuffer, NUMPIXELS * 3);
