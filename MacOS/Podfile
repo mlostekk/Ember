@@ -1,0 +1,18 @@
+# Uncomment the next line to define a global platform for your project
+platform :osx, '10.15'
+
+### EMBER MAIN PODS
+target 'Ember' do
+  use_frameworks!
+  
+  pod 'ORSSerialPort'
+
+end
+
+### TESTING PODS
+target 'EmberTests' do
+  use_frameworks!
+
+  pod 'Nimble'
+
+end
