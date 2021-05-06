@@ -1,9 +1,4 @@
-//
-//  AppDelegate.swift
-//  Ember
-//
-//  Created by Martin Mlostek on 28.04.21.
-//
+// Copyright (c) 2021 Nomad5. All rights reserved.
 
 import Cocoa
 import SwiftUI
@@ -13,8 +8,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     var window: NSWindow!
 
+    /// The main DI container
+    let assembler: Assembler = AppAssembler()
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
+
         // Create the SwiftUI view that provides the window contents.
         let contentView = ContentView()
 
