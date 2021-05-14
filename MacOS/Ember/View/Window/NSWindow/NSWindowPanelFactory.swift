@@ -2,9 +2,9 @@
 
 import Foundation
 
-class NSWindowPanelFactory: PanelFactory {
+class NSWindowPanelFactory: WindowFactory {
 
-    func createPanel() -> Panel {
+    func createWindow() -> Window {
         return NSWindowPanel()
     }
 }

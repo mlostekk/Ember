@@ -6,7 +6,9 @@ import Foundation
 /// the DI to be configured
 protocol Assembler: NSWindowPanelAssembler,
                     AVCaptureServiceAssembler,
-                    ORSSerialPortAssembler {
+                    ORSSerialPortAssembler,
+                    SwiftUISettingsViewAssembler,
+                    PlacementProviderAssembler {
 
 }
 

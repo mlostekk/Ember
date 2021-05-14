@@ -2,5 +2,5 @@
 
 import Foundation
 
-protocol Panel {
+protocol Window {
 }

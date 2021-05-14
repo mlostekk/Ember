@@ -2,6 +2,7 @@
 
 import Foundation
 
-class NSWindowPanel : Panel {
-
+protocol SettingsViewAssembler {
+    func resolve() -> SettingsView
 }
+

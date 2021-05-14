@@ -3,7 +3,7 @@
 import Foundation
 
 /// Abstract factory
-protocol PanelFactory {
+protocol WindowFactory {
 
-    func createPanel() -> Panel
+    func createWindow() -> Window
 }

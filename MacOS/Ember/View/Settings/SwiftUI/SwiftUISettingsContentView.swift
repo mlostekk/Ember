@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ContentView: View {
+struct SwiftUISettingsContentView: View {
     @State private var blurAmount: CGFloat = 0
     var body: some View {
         Text("Hello, World!")
@@ -21,6 +21,6 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        SwiftUISettingsContentView()
     }
 }

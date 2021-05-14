@@ -3,8 +3,8 @@
 import Foundation
 
 /// Abstract assembler
-protocol PanelAssembler {
+protocol WindowAssembler {
 
-    func resolve() -> PanelFactory
+    func resolve() -> WindowFactory
 
 }

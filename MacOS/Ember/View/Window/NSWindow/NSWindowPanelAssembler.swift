@@ -3,12 +3,12 @@
 import Foundation
 
 /// NSWindow implementation of the panel assembler
-protocol NSWindowPanelAssembler: PanelAssembler {
+protocol NSWindowPanelAssembler: WindowAssembler {
 }
 
 extension NSWindowPanelAssembler where Self: Assembler {
 
-    func resolve() -> PanelFactory {
+    func resolve() -> WindowFactory {
         fatalError("resolve() has not been implemented")
     }
 }
