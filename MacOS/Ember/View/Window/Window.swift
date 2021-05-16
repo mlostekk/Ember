@@ -3,4 +3,5 @@
 import Foundation
 
 protocol Window {
+    func show()
 }

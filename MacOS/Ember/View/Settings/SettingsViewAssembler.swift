@@ -4,5 +4,6 @@ import Foundation
 
 protocol SettingsViewAssembler {
     func resolve() -> SettingsView
-}
 
+    func resolve() -> Settings
+}

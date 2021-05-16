@@ -1,25 +1,27 @@
-//
-//  ContentView.swift
-//  Ember
-//
-//  Created by Martin Mlostek on 28.04.21.
-//
+// Copyright (c) 2021 Nomad5. All rights reserved.
 
 import SwiftUI
 
-struct SwiftUISettingsContentView: View {
-    @State private var blurAmount: CGFloat = 0
-    var body: some View {
-        Text("Hello, World!")
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .blur(radius: blurAmount)
+// https://mokacoding.com/blog/swiftui-dependency-injection/
 
-        Slider(value: $blurAmount, in: 0...20)
+struct SwiftUISettingsContentView: View {
+
+    @EnvironmentObject var settings: Settings
+
+    var body: some View {
+        Text("Hello, World! This is some blur text")
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .blur(radius: CGFloat(settings.blurAmount))
+        Divider()
+        Group {
+            Text("Blur amount")
+            Slider(value: $settings.blurAmount, in: 0...100)
+        }
     }
 }
 
 
-struct ContentView_Previews: PreviewProvider {
+struct SwiftUISettingsContentView_Previews: PreviewProvider {
     static var previews: some View {
         SwiftUISettingsContentView()
     }

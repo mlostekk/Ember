@@ -4,7 +4,15 @@ import Foundation
 
 class NSWindowPanelFactory: WindowFactory {
 
-    func createWindow() -> Window {
-        return NSWindowPanel()
+    /// Injected dependencies
+    private let placementProvider: PlacementProvider
+
+    /// Construction with dependencies
+    init(placementProvider: PlacementProvider) {
+        self.placementProvider = placementProvider
+    }
+
+    func createWindow(at position: WindowPosition) -> Window {
+        NSWindowPanel(at: placementProvider.getPlacement(for: position.placementType).target)
     }
 }

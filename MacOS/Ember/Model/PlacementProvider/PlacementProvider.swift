@@ -43,7 +43,7 @@ class StaticMainDisplayPlacementProvider: PlacementProvider {
         }
         let screenWidth  = screen.frame.width
         let screenHeight = screen.frame.height
-        let mappedWidth  = screenWidth * aspectRatio16to9.ratio
+        let mappedWidth  = screenHeight * aspectRatio16to9.ratio
 
         let verticalBlackBarWidth = (screenWidth - mappedWidth) / 2.0
         let verticalBlackBarSize  = CGSize(width: verticalBlackBarWidth, height: screenHeight)

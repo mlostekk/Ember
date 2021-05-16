@@ -9,6 +9,6 @@ protocol NSWindowPanelAssembler: WindowAssembler {
 extension NSWindowPanelAssembler where Self: Assembler {
 
     func resolve() -> WindowFactory {
-        fatalError("resolve() has not been implemented")
+        NSWindowPanelFactory(placementProvider: resolve())
     }
 }

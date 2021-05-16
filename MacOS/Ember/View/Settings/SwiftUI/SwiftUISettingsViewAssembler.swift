@@ -8,6 +8,7 @@ protocol SwiftUISettingsViewAssembler {
 
 extension SwiftUISettingsViewAssembler where Self: Assembler {
     func resolve() -> SettingsView {
-        SwiftUISettingsView(placementProvider: resolve())
+        SwiftUISettingsView(placementProvider: resolve(),
+                            settings: resolve())
     }
 }
