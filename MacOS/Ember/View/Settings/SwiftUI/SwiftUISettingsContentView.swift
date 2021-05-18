@@ -7,27 +7,29 @@ import SwiftUI
 struct SwiftUISettingsContentView: View {
 
     @EnvironmentObject var settings: Settings
+    @EnvironmentObject var actions:  Actions
 
     var body: some View {
-        Text("Hello, World! This is some blur text")
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .blur(radius: CGFloat(settings.blurAmount))
-        Divider()
-        Picker("Choose your display", selection: $settings.selectedScreen) {
-            ForEach(NSScreen.screens, id: \.self) { screen in
-                Text(screen.localizedName)
+        Group {
+            Picker("Choose your display", selection: $settings.selectedScreen) {
+                ForEach(NSScreen.screens, id: \.self) { screen in
+                    Text(screen.localizedName)
+                }
             }
-        }
-        Divider()
-        Group {
-            Text("Blur amount \(settings.blurAmount)")
-            Slider(value: $settings.blurAmount, in: 0...100)
-        }
-        Divider()
-        Group {
-            Text("Framerate \(Int(settings.frameRate))")
-            Slider(value: $settings.frameRate, in: 1...100)
-        }
+            Button("Start") {
+                actions.startRenderingSubject.send(())
+            }
+            Divider()
+            Group {
+                Text("Blur amount \(settings.blurAmount)")
+                Slider(value: $settings.blurAmount, in: 0...100)
+            }
+            Divider()
+            Group {
+                Text("Framerate \(Int(settings.frameRate))")
+                Slider(value: $settings.frameRate, in: 1...100)
+            }
+        }.padding()
     }
 }
 

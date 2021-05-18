@@ -11,6 +11,7 @@ class App {
     /// The subscription
     private var captureSubscription:   AnyCancellable!
     private var processorSubscription: AnyCancellable!
+    private var actionSubscription:    AnyCancellable!
 
     /// Dependencies
     private let capture:               CaptureService
@@ -32,7 +33,14 @@ class App {
     func start() {
         /// Settings
         settingsView.show()
+        /// Subscribe to start button
+        let actions: Actions = assembler.resolve()
+        actionSubscription = actions.startRenderingStream.sink { [weak self] in
+            self?.showWindows()
+        }
+    }
 
+    private func showWindows() {
         /// Rendering windows
         windows[.left] = windowFactory.createWindow(at: .left)
         windows[.right] = windowFactory.createWindow(at: .right)

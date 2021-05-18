@@ -17,7 +17,8 @@ class SwiftUISettingsView: SettingsView {
 
     /// Construction with dependencies
     init(placementProvider: PlacementProvider,
-         settings: Settings) {
+         settings: Settings,
+         actions: Actions) {
         self.placementProvider = placementProvider
         // Create the window and set the content view.
         window = NSWindow(
@@ -27,7 +28,10 @@ class SwiftUISettingsView: SettingsView {
         window.isReleasedWhenClosed = false
         window.center()
         window.setFrameAutosaveName("Settings Window")
-        window.contentView = NSHostingView(rootView: contentView.environmentObject(settings))
+        window.contentView = NSHostingView(
+                rootView: contentView
+                        .environmentObject(settings)
+                        .environmentObject(actions))
         window.orderFrontRegardless()
     }
 

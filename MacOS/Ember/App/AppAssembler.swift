@@ -10,6 +10,7 @@ protocol Assembler: NSWindowPanelAssembler,
                     SwiftUISettingsViewAssembler,
                     PlacementProviderAssembler,
                     SettingsAssembler,
+                    ActionsAssembler,
                     ProcessorAssembler,
                     MetalRenderViewAssembler {
 

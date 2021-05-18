@@ -13,4 +13,5 @@ class Settings: Service, ObservableObject {
     @Published var frameRate:      Double   = 30
     @Published var selectedScreen: NSScreen = NSScreen.main!
 
+
 }
