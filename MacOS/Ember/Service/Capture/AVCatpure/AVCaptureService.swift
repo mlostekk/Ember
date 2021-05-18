@@ -17,11 +17,18 @@ class AVCaptureService: NSObject, CaptureService {
 
     private let avCaptureSession = AVCaptureSession()
 
+    let subscription: AnyCancellable
+
     /// Construction
-    override init() {
-        super.init()
+    init(settings: Settings) {
         let input = AVCaptureScreenInput(displayID: CGMainDisplayID())!
         input.minFrameDuration = CMTimeMake(value: 1, timescale: 30)
+        subscription = settings.$frameRate.sink { framerate in
+            input.minFrameDuration = CMTimeMake(value: 1, timescale: Int32(framerate))
+        }
+
+        super.init()
+
         avCaptureSession.addInput(input)
         let output = AVCaptureVideoDataOutput()
         output.videoSettings = [String(kCVPixelBufferPixelFormatTypeKey): kCVPixelFormatType_32BGRA]

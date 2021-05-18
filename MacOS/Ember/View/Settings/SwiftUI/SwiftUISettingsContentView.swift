@@ -14,8 +14,13 @@ struct SwiftUISettingsContentView: View {
                 .blur(radius: CGFloat(settings.blurAmount))
         Divider()
         Group {
-            Text("Blur amount")
+            Text("Blur amount \(settings.blurAmount)")
             Slider(value: $settings.blurAmount, in: 0...100)
+        }
+        Divider()
+        Group {
+            Text("Framerate \(Int(settings.frameRate))")
+            Slider(value: $settings.frameRate, in: 1...100)
         }
     }
 }

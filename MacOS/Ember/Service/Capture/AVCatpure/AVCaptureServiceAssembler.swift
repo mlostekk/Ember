@@ -7,6 +7,6 @@ protocol AVCaptureServiceAssembler: CaptureServiceAssembler {
 
 extension AVCaptureServiceAssembler where Self: Assembler {
     func resolve() -> CaptureService {
-        return AVCaptureService()
+        AVCaptureService(settings: resolve())
     }
 }

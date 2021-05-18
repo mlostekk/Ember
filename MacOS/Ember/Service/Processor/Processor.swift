@@ -18,7 +18,10 @@ class SimpleImageProcessor: Service, Processor {
     private(set) static var uniqueKey: String = String(describing: SimpleImageProcessor.self)
 
     /// The internal subject
-    private let imageSubject = PassthroughSubject<CIImage, Never>()
+    private let imageSubject  = PassthroughSubject<CIImage, Never>()
+
+    /// Effects
+    private let contrastBoost = CIFilter(name: "CIColorControls")!
 
     /// Injected dependencies
     private let settings: Settings
@@ -35,7 +38,11 @@ class SimpleImageProcessor: Service, Processor {
 
     /// Publish a source image
     func publish(image: CIImage) {
-        imageSubject.send(image)
+        contrastBoost.setValue(image, forKey: kCIInputImageKey)
+        contrastBoost.setValue(1.0, forKey: "inputContrast")
+        let contrastImage = contrastBoost.outputImage!
+        let blurred       = contrastImage.applyingGaussianBlur(sigma: settings.blurAmount)
+        imageSubject.send(blurred)
     }
 
 }

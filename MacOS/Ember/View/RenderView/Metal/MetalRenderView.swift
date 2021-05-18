@@ -9,7 +9,7 @@ class MetalRenderView: MTKView, RenderView {
     private var imageToDisplay: CIImage?
     private let offset:         Int
 
-    private lazy var commandQueue = self.device?.makeCommandQueue()
+    private lazy var commandQueue = device?.makeCommandQueue()
     private lazy var context: CIContext = {
         guard let device = self.device else {
             assertionFailure("The PreviewUIView should have a Metal device")
@@ -20,23 +20,16 @@ class MetalRenderView: MTKView, RenderView {
 
 
     init(device: MTLDevice? = MTLCreateSystemDefaultDevice(), frame: CGRect, offset: Int) {
-
         self.offset = offset
         super.init(frame: frame, device: device)
-
         // setup view to only draw when we need it (i.e., a new pixel buffer arrived),
         // not continuously
-        self.isPaused = true
-        self.enableSetNeedsDisplay = true
-        self.autoResizeDrawable = true
-
-        #if os(iOS)
-            // we only need a wider gamut pixel format if the display supports it
-            self.colorPixelFormat = (self.traitCollection.displayGamut == .P3) ? .bgr10_xr_srgb : .bgra8Unorm_srgb
-        #endif
+        isPaused = true
+        enableSetNeedsDisplay = true
+        autoResizeDrawable = true
         // this is important, otherwise Core Image could not render into the
         // view's framebuffer directly
-        self.framebufferOnly = false
+        framebufferOnly = false
     }
 
     @available(*, unavailable)
@@ -49,32 +42,11 @@ class MetalRenderView: MTKView, RenderView {
         needsDisplay = true
     }
 
-    let contrastBoost = CIFilter(name: "CIColorControls")
-
     override func draw(_ rect: CGRect) {
-        guard let input = self.imageToDisplay,
-              let currentDrawable = self.currentDrawable,
-              let commandBuffer = self.commandQueue?.makeCommandBuffer() else { return }
-
-        // scale to fit into view
-        let drawableSize  = self.drawableSize
-        let scaleX        = drawableSize.width / input.extent.width
-        let scaleY        = drawableSize.height / input.extent.height
-        let scale         = min(scaleX, scaleY)
-        let scaledImage   = input.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
-
-        // center in the view
-        let originX       = max(drawableSize.width - scaledImage.extent.size.width, 0) / 2
-        let originY       = max(drawableSize.height - scaledImage.extent.size.height, 0) / 2
-        let centeredImage = scaledImage.transformed(by: CGAffineTransform(translationX: originX, y: originY))
-
-        contrastBoost!.setValue(input, forKey: kCIInputImageKey)
-        contrastBoost!.setValue(1.0, forKey: "inputContrast")
-        let contrastImage = contrastBoost!.outputImage
-
-        //let sclaed = input.transformed(by: CGAffineTransform(scaleX: 1.2, y: 1.2))
-        let moved         = contrastImage!.transformed(by: CGAffineTransform(translationX: CGFloat(offset), y: 0))
-        let blurred       = moved.applyingGaussianBlur(sigma: 40)
+        guard let input = imageToDisplay,
+              let currentDrawable = currentDrawable,
+              let commandBuffer = commandQueue?.makeCommandBuffer() else { return }
+        let moved         = input.transformed(by: CGAffineTransform(translationX: CGFloat(offset), y: 0))
         // Create a render destination that allows to lazily fetch the target texture
         // which allows the encoder to process all CI commands _before_ the texture is actually available.
         // This gives a nice speed boost because the CPU doesn't need to wait for the GPU to finish
@@ -83,8 +55,6 @@ class MetalRenderView: MTKView, RenderView {
         // "Rendering to a CIRenderDestination initialized with a commandBuffer requires encoding all
         // the commands to render an image into the specified buffer. This may impact system responsiveness
         // and may result in higher memory usage if the image requires many passes to render."
-
-
         let destination = CIRenderDestination(width: 440,
                                               height: 1440,
                                               pixelFormat: self.colorPixelFormat,
@@ -94,7 +64,7 @@ class MetalRenderView: MTKView, RenderView {
                                               })
 
         do {
-            try self.context.startTask(toRender: blurred, to: destination)
+            try context.startTask(toRender: moved, to: destination)
         } catch {
             assertionFailure("Failed to render to preview view: \(error)")
         }
@@ -104,6 +74,6 @@ class MetalRenderView: MTKView, RenderView {
     }
 
     override var allowsVibrancy: Bool {
-        return true
+        true
     }
 }
