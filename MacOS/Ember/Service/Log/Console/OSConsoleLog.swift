@@ -8,7 +8,7 @@ import os
 class OSConsoleLog {
 
     /// The subscription
-    let logSubscription: AnyCancellable
+    private let logSubscription: AnyCancellable
 
     /// Construction
     public init(with logPublisher: AnyPublisher<Log.Entry, Never>) {

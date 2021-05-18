@@ -13,6 +13,7 @@ enum PlacementType {
 struct Mapping {
     let source: CGRect
     let target: CGRect
+    let offset: Int
 }
 
 /// This service returns coordinates for the given window type
@@ -52,18 +53,21 @@ class StaticMainDisplayPlacementProvider: PlacementProvider {
                 return Mapping(source: CGRect(origin: CGPoint(x: verticalBlackBarWidth, y: 0),
                                               size: verticalBlackBarSize),
                                target: CGRect(origin: .zero,
-                                              size: verticalBlackBarSize))
+                                              size: verticalBlackBarSize),
+                               offset: -440)
             case .right:
                 return Mapping(source: CGRect(origin: CGPoint(x: screenWidth - verticalBlackBarWidth, y: 0),
                                               size: verticalBlackBarSize),
                                target: CGRect(origin: CGPoint(x: screenWidth - verticalBlackBarWidth, y: 0),
-                                              size: verticalBlackBarSize))
+                                              size: verticalBlackBarSize),
+                               offset: -2560)
             case .settings:
                 let size = NSSize(width: 400, height: 400)
                 return Mapping(source: .zero,
                                target: CGRect(origin: CGPoint(x: screen.frame.midX - size.width / 2.0,
                                                               y: screen.frame.midY - size.height / 2.0),
-                                              size: size))
+                                              size: size),
+                               offset: 0)
         }
     }
 }

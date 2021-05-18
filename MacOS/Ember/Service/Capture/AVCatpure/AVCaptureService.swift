@@ -2,18 +2,18 @@
 
 import Foundation
 import Combine
-import CoreMedia
+import CoreImage
 import AVFoundation
 
 class AVCaptureService: NSObject, CaptureService {
 
     /// The exposed pixel buffer
-    var pixelBuffer: AnyPublisher<CMSampleBuffer, Never> {
+    var pixelBuffer: AnyPublisher<CIImage, Never> {
         pixelBufferSubject.eraseToAnyPublisher()
     }
 
     /// The internal pixel buffer subject
-    private let pixelBufferSubject = PassthroughSubject<CMSampleBuffer, Never>()
+    private let pixelBufferSubject = PassthroughSubject<CIImage, Never>()
 
     private let avCaptureSession = AVCaptureSession()
 
@@ -44,6 +44,15 @@ class AVCaptureService: NSObject, CaptureService {
 extension AVCaptureService: AVCaptureVideoDataOutputSampleBufferDelegate {
 
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
-        pixelBufferSubject.send(sampleBuffer)
+        guard let pixelBuffer: CVPixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
+            Log.e("Invalid buffer")
+            return
+        }
+
+        /// Lock the pixel buffer, process it and send it
+        CVPixelBufferLockBaseAddress(pixelBuffer, .readOnly);
+        let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
+        pixelBufferSubject.send(ciImage)
+        CVPixelBufferUnlockBaseAddress(pixelBuffer, .readOnly);
     }
 }

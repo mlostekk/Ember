@@ -13,6 +13,7 @@ class NSWindowPanelFactory: WindowFactory {
     }
 
     func createWindow(at position: WindowPosition) -> Window {
-        NSWindowPanel(at: placementProvider.getPlacement(for: position.placementType).target)
+        let placement = placementProvider.getPlacement(for: position.placementType)
+        return NSWindowPanel(at: placement.target, offset: placement.offset)
     }
 }

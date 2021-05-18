@@ -7,13 +7,13 @@ import SwiftUI
 class AppDelegate: NSObject, NSApplicationDelegate {
 
     /// The main DI container
-    let assembler: Assembler = AppAssembler()
-    lazy var app: App = {
+    private let assembler: Assembler = AppAssembler()
+    private lazy var app: App = {
         App(with: assembler)
     }()
 
     /// Console logging
-    let consoleLog = OSConsoleLog(with: Log.logEntryPublisher)
+    private let consoleLog = OSConsoleLog(with: Log.logEntryPublisher)
 
     /// Application start
     func applicationDidFinishLaunching(_ aNotification: Notification) {
