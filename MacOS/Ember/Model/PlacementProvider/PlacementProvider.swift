@@ -13,7 +13,7 @@ enum PlacementType {
 struct Mapping {
     let source: CGRect
     let target: CGRect
-    let offset: Int
+    let offset: CGFloat
 }
 
 /// This service returns coordinates for the given window type
@@ -36,15 +36,23 @@ class StaticMainDisplayPlacementProvider: PlacementProvider {
     }
 
     let aspectRatio16to9 = AspectRatio(width: 16, height: 9)
+    let aspectRatio4to3  = AspectRatio(width: 4, height: 3)
+
+    /// Injected dependencies
+    private let settings: Settings
+
+    /// Construction with dependencies
+    init(settings: Settings) {
+        self.settings = settings
+    }
 
     /// Get placement for given type
     func getPlacement(for type: PlacementType) -> Mapping {
-        guard let screen = NSScreen.main else {
-            fatalError("No main screen found")
-        }
+        let screen = settings.selectedScreen
         let screenWidth  = screen.frame.width
         let screenHeight = screen.frame.height
-        let mappedWidth  = screenHeight * aspectRatio16to9.ratio
+        let mappedWidth  = screenHeight * aspectRatio4to3.ratio
+        assert(mappedWidth > 0)
 
         let verticalBlackBarWidth = (screenWidth - mappedWidth) / 2.0
         let verticalBlackBarSize  = CGSize(width: verticalBlackBarWidth, height: screenHeight)
@@ -54,13 +62,13 @@ class StaticMainDisplayPlacementProvider: PlacementProvider {
                                               size: verticalBlackBarSize),
                                target: CGRect(origin: .zero,
                                               size: verticalBlackBarSize),
-                               offset: -440)
+                               offset: (-verticalBlackBarWidth) * screen.backingScaleFactor)
             case .right:
                 return Mapping(source: CGRect(origin: CGPoint(x: screenWidth - verticalBlackBarWidth, y: 0),
                                               size: verticalBlackBarSize),
                                target: CGRect(origin: CGPoint(x: screenWidth - verticalBlackBarWidth, y: 0),
                                               size: verticalBlackBarSize),
-                               offset: -2560)
+                               offset: (-screenWidth + verticalBlackBarWidth * 2) * screen.backingScaleFactor)
             case .settings:
                 let size = NSSize(width: 400, height: 400)
                 return Mapping(source: .zero,

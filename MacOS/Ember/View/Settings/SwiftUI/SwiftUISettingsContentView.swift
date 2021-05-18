@@ -13,6 +13,12 @@ struct SwiftUISettingsContentView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .blur(radius: CGFloat(settings.blurAmount))
         Divider()
+        Picker("Choose your display", selection: $settings.selectedScreen) {
+            ForEach(NSScreen.screens, id: \.self) { screen in
+                Text(screen.localizedName)
+            }
+        }
+        Divider()
         Group {
             Text("Blur amount \(settings.blurAmount)")
             Slider(value: $settings.blurAmount, in: 0...100)

@@ -8,6 +8,7 @@ protocol MetalRenderViewAssembler: RenderViewAssembler {
 
 extension MetalRenderViewAssembler where Self: Assembler {
     func resolve() -> RenderViewFactory {
-        MetalRenderViewFactory(placementProvider: resolve())
+        MetalRenderViewFactory(placementProvider: resolve(),
+                               settings: resolve())
     }
 }

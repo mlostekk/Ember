@@ -7,7 +7,8 @@ class MetalRenderView: MTKView, RenderView {
 
     /// The image that should be displayed next.
     private var imageToDisplay: CIImage?
-    private let offset:         Int
+    private let offset:         CGFloat
+    private let settings:       Settings
 
     private lazy var commandQueue = device?.makeCommandQueue()
     private lazy var context: CIContext = {
@@ -19,7 +20,11 @@ class MetalRenderView: MTKView, RenderView {
     }()
 
 
-    init(device: MTLDevice? = MTLCreateSystemDefaultDevice(), frame: CGRect, offset: Int) {
+    init(device: MTLDevice? = MTLCreateSystemDefaultDevice(),
+         frame: CGRect,
+         offset: CGFloat,
+         settings: Settings) {
+        self.settings = settings
         self.offset = offset
         super.init(frame: frame, device: device)
         // setup view to only draw when we need it (i.e., a new pixel buffer arrived),
@@ -46,7 +51,8 @@ class MetalRenderView: MTKView, RenderView {
         guard let input = imageToDisplay,
               let currentDrawable = currentDrawable,
               let commandBuffer = commandQueue?.makeCommandBuffer() else { return }
-        let moved         = input.transformed(by: CGAffineTransform(translationX: CGFloat(offset), y: 0))
+        let scalingFactor = settings.selectedScreen.backingScaleFactor
+        let moved         = input.transformed(by: CGAffineTransform(translationX: offset, y: 0))
         // Create a render destination that allows to lazily fetch the target texture
         // which allows the encoder to process all CI commands _before_ the texture is actually available.
         // This gives a nice speed boost because the CPU doesn't need to wait for the GPU to finish
@@ -55,12 +61,12 @@ class MetalRenderView: MTKView, RenderView {
         // "Rendering to a CIRenderDestination initialized with a commandBuffer requires encoding all
         // the commands to render an image into the specified buffer. This may impact system responsiveness
         // and may result in higher memory usage if the image requires many passes to render."
-        let destination = CIRenderDestination(width: 440,
-                                              height: 1440,
-                                              pixelFormat: self.colorPixelFormat,
+        let destination = CIRenderDestination(width: Int(rect.size.width * scalingFactor),
+                                              height: Int(rect.size.height * scalingFactor),
+                                              pixelFormat: colorPixelFormat,
                                               commandBuffer: nil,
                                               mtlTextureProvider: { () -> MTLTexture in
-                                                  return currentDrawable.texture
+                                                  currentDrawable.texture
                                               })
 
         do {
