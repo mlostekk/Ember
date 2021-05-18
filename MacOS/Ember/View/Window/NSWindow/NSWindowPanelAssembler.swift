@@ -9,6 +9,7 @@ protocol NSWindowPanelAssembler: WindowAssembler {
 extension NSWindowPanelAssembler where Self: Assembler {
 
     func resolve() -> WindowFactory {
-        NSWindowPanelFactory(placementProvider: resolve())
+        NSWindowPanelFactory(placementProvider: resolve(),
+                             renderViewFactory: resolve())
     }
 }

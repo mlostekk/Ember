@@ -10,7 +10,8 @@ protocol Assembler: NSWindowPanelAssembler,
                     SwiftUISettingsViewAssembler,
                     PlacementProviderAssembler,
                     SettingsAssembler,
-                    ProcessorAssembler {
+                    ProcessorAssembler,
+                    MetalRenderViewAssembler {
 
     /// Register a new service. Never save global variables anymore
     func register(_ service: Service)

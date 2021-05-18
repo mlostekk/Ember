@@ -6,14 +6,17 @@ class NSWindowPanelFactory: WindowFactory {
 
     /// Injected dependencies
     private let placementProvider: PlacementProvider
+    private let renderViewFactory: RenderViewFactory
 
     /// Construction with dependencies
-    init(placementProvider: PlacementProvider) {
+    init(placementProvider: PlacementProvider,
+         renderViewFactory: RenderViewFactory) {
         self.placementProvider = placementProvider
+        self.renderViewFactory = renderViewFactory
     }
 
     func createWindow(at position: WindowPosition) -> Window {
-        let placement = placementProvider.getPlacement(for: position.placementType)
-        return NSWindowPanel(at: placement.target, offset: placement.offset)
+        NSWindowPanel(renderView: renderViewFactory.createRenderView(at: position),
+                      at: placementProvider.getPlacement(for: position.placementType).target)
     }
 }
