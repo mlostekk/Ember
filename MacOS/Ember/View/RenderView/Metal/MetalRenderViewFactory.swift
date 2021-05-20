@@ -14,10 +14,9 @@ class MetalRenderViewFactory: RenderViewFactory {
         self.settings = settings
     }
 
-    func createRenderView(at position: WindowPosition) -> RenderView {
-        let placement = placementProvider.getPlacement(for: position.placementType)
-        return MetalRenderView(frame: placement.target,
-                               offset: placement.offset,
-                               settings: settings)
+    func createRenderView(at placement: Placement) -> RenderView {
+        MetalRenderView(frame: placement.target,
+                        offset: placement.offset,
+                        settings: settings)
     }
 }

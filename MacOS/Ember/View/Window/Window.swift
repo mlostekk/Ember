@@ -5,4 +5,5 @@ import CoreImage
 
 protocol Window {
     func show(image: CIImage)
+    func close()
 }

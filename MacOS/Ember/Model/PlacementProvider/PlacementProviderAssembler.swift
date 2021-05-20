@@ -8,6 +8,6 @@ protocol PlacementProviderAssembler {
 
 extension PlacementProviderAssembler where Self: Assembler {
     func resolve() -> PlacementProvider {
-        StaticMainDisplayPlacementProvider(settings: resolve())
+        StaticMainDisplayPlacementProvider()
     }
 }

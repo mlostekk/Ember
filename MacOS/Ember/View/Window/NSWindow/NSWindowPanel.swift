@@ -23,9 +23,21 @@ class NSWindowPanel: Window {
         window.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         window.contentView = renderView
         window.orderFrontRegardless()
+        window.isReleasedWhenClosed = false
     }
 
+    /// Destruction
+    deinit {
+        Log.d("Window destroyed")
+    }
+
+    /// Pass down the image
     func show(image: CIImage) {
         renderView.setImage(image)
+    }
+
+    /// Close the window
+    func close() {
+        window.close()
     }
 }

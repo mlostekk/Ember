@@ -19,7 +19,12 @@ class MetalRenderView: MTKView, RenderView {
         return CIContext(mtlDevice: device)
     }()
 
+    /// Allow vibrancy in case used with blur effect view
+    override var allowsVibrancy: Bool {
+        true
+    }
 
+    /// Construction with config
     init(device: MTLDevice? = MTLCreateSystemDefaultDevice(),
          frame: CGRect,
          offset: CGFloat,
@@ -37,16 +42,24 @@ class MetalRenderView: MTKView, RenderView {
         framebufferOnly = false
     }
 
+    /// Shall not pass
     @available(*, unavailable)
     required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
+    /// Destruction
+    deinit {
+        Log.e("MetalRenderView destroyed")
+    }
+
+    /// Set the image and trigger draw
     func setImage(_ image: CIImage) {
         imageToDisplay = image
         needsDisplay = true
     }
 
+    /// Draw the actual image
     override func draw(_ rect: CGRect) {
         guard let input = imageToDisplay,
               let currentDrawable = currentDrawable,
@@ -79,7 +92,4 @@ class MetalRenderView: MTKView, RenderView {
         commandBuffer.commit()
     }
 
-    override var allowsVibrancy: Bool {
-        true
-    }
 }

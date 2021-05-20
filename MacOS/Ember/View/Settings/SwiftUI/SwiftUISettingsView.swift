@@ -22,7 +22,7 @@ class SwiftUISettingsView: SettingsView {
         self.placementProvider = placementProvider
         // Create the window and set the content view.
         window = NSWindow(
-                contentRect: placementProvider.getPlacement(for: .settings).target,
+                contentRect: CGRect(origin: .zero, size: CGSize(width: 400, height: 400)),
                 styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
                 backing: .buffered, defer: false)
         window.isReleasedWhenClosed = false

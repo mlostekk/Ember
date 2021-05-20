@@ -8,18 +8,19 @@ import Combine
 /// The main application model
 class App {
 
-    /// The subscription
-    private var captureSubscription:   AnyCancellable!
-    private var processorSubscription: AnyCancellable!
-    private var actionSubscription:    AnyCancellable!
-
     /// Dependencies
-    private let capture:               CaptureService
-    private let imageProcessor:        Processor
-    private let assembler:             Assembler
-    private let settingsView:          SettingsView
-    private let windowFactory:         WindowFactory
-    private var windows:               [WindowPosition: Window] = [:]
+    private let capture:        CaptureService
+    private let imageProcessor: Processor
+    private let assembler:      Assembler
+    private let settingsView:   SettingsView
+    private let windowFactory:  WindowFactory
+    private let settings:       Settings
+    private let actions:        Actions
+    private var windows:        [WindowPosition: Window] = [:]
+
+    /// The cancel bag
+    private var globalCancelBag                          = CancelBag()
+    private var windowCancelBag                          = CancelBag()
 
     /// Construction with dependencies
     init(with assembler: Assembler) {
@@ -27,38 +28,52 @@ class App {
         self.settingsView = assembler.resolve()
         self.windowFactory = assembler.resolve()
         self.imageProcessor = assembler.resolve()
+        self.settings = assembler.resolve()
+        self.actions = assembler.resolve()
         capture = assembler.resolve()
     }
 
     func start() {
         /// Settings
         settingsView.show()
-        /// Subscribe to start button
-        let actions: Actions = assembler.resolve()
-        actionSubscription = actions.startRenderingStream.sink { [weak self] in
-            self?.showWindows()
+        globalCancelBag.collect {
+            /// Subscribe to start button
+            actions.startRenderingStream.sink { [weak self] in
+                guard let self = self else { return }
+                self.showWindows(sourceAspectRatio: self.settings.sourceAspectRatio, targetScreen: self.settings.selectedScreen)
+            }
+            /// Subscribe to stop button
+            actions.stopRenderingStream.sink { [weak self] in
+                guard let self = self else { return }
+                self.killWindows()
+            }
         }
     }
 
-    private func showWindows() {
+    private func showWindows(sourceAspectRatio: AspectRatio, targetScreen: NSScreen) {
         /// Rendering windows
-        windows[.left] = windowFactory.createWindow(at: .left)
-        windows[.right] = windowFactory.createWindow(at: .right)
+        windows[.left] = windowFactory.createWindowAt(position: .left, sourceAspectRatio: sourceAspectRatio, targetScreen: targetScreen)
+        windows[.right] = windowFactory.createWindowAt(position: .right, sourceAspectRatio: sourceAspectRatio, targetScreen: targetScreen)
 
-        /// Handling the processed image
-        processorSubscription = imageProcessor.imageStream.sink { [weak self] ciImage in
-            self?.windows.forEach { _, window in
-                window.show(image: ciImage)
+        windowCancelBag.collect {
+            /// Handling the processed image
+            imageProcessor.imageStream.sink { [weak self] ciImage in
+                self?.windows.forEach { _, window in
+                    window.show(image: ciImage)
+                }
+            }
+            /// Configure capturing & rendering
+            capture.pixelBuffer.sink { [weak self] ciImage in
+                self?.imageProcessor.publish(image: ciImage)
             }
         }
-
-        /// Configure image rendering
-        /// Configure capturing
-        captureSubscription = capture.pixelBuffer.sink { [weak self] ciImage in
-            self?.imageProcessor.publish(image: ciImage)
-        }
         capture.start()
+    }
 
+    private func killWindows() {
+        windowCancelBag.removeAll()
+        windows.forEach { $1.close() }
+        windows.removeAll()
     }
 
     func stop() {

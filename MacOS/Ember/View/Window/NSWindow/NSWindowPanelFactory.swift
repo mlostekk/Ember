@@ -1,6 +1,7 @@
 // Copyright (c) 2021 Nomad5. All rights reserved.
 
 import Foundation
+import Cocoa
 
 class NSWindowPanelFactory: WindowFactory {
 
@@ -15,8 +16,13 @@ class NSWindowPanelFactory: WindowFactory {
         self.renderViewFactory = renderViewFactory
     }
 
-    func createWindow(at position: WindowPosition) -> Window {
-        NSWindowPanel(renderView: renderViewFactory.createRenderView(at: position),
-                      at: placementProvider.getPlacement(for: position.placementType).target)
+    func createWindowAt(position: WindowPosition,
+                        sourceAspectRatio: AspectRatio,
+                        targetScreen: NSScreen) -> Window {
+        let placement  = placementProvider.getPlacement(for: position,
+                                                        sourceAspectRatio: sourceAspectRatio,
+                                                        targetScreen: targetScreen)
+        let renderView = renderViewFactory.createRenderView(at: placement)
+        return NSWindowPanel(renderView: renderView, at: placement.target)
     }
 }

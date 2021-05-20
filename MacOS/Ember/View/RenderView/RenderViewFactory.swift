@@ -3,5 +3,5 @@
 import Foundation
 
 protocol RenderViewFactory {
-    func createRenderView(at position: WindowPosition) -> RenderView
+    func createRenderView(at placement: Placement) -> RenderView
 }

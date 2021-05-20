@@ -6,8 +6,9 @@ import SwiftUI
 
 struct SwiftUISettingsContentView: View {
 
-    @EnvironmentObject var settings: Settings
-    @EnvironmentObject var actions:  Actions
+    @EnvironmentObject var settings:  Settings
+    @EnvironmentObject var actions:   Actions
+    @State var             isRunning: Bool = false
 
     var body: some View {
         Group {
@@ -15,9 +16,23 @@ struct SwiftUISettingsContentView: View {
                 ForEach(NSScreen.screens, id: \.self) { screen in
                     Text(screen.localizedName)
                 }
+            }.disabled(isRunning)
+            Picker("Choose the aspect ratio", selection: $settings.sourceAspectRatio) {
+                ForEach(Globals.availableAspectRatios, id: \.self) { aspectRatio in
+                    Text(aspectRatio.description)
+                }
+            }.disabled(isRunning)
+            if isRunning{
+                Button("Stop") {
+                    actions.stopRenderingSubject.send(())
+                    isRunning = false
+                }
             }
-            Button("Start") {
-                actions.startRenderingSubject.send(())
+            else {
+                Button("Start") {
+                    actions.startRenderingSubject.send(())
+                    isRunning = true
+                }
             }
             Divider()
             Group {
