@@ -2,5 +2,8 @@
 
 import Foundation
 
+/// Serial port for sending out info to the LEDs
 protocol SerialPort {
+    /// Send out colors
+    func send(colors: [Color])
 }

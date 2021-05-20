@@ -12,7 +12,10 @@ protocol Assembler: NSWindowPanelAssembler,
                     SettingsAssembler,
                     ActionsAssembler,
                     ProcessorAssembler,
-                    MetalRenderViewAssembler {
+                    MetalRenderViewAssembler,
+                    EdgeExtractorAssembler,
+                    EdgeExtractorAssembler,
+                    EdgeSerializerAssembler {
 
     /// Register a new service. Never save global variables anymore
     func register(_ service: Service)

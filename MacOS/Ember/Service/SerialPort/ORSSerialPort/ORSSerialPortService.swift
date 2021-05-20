@@ -3,4 +3,8 @@
 import Foundation
 
 class ORSSerialPortService: SerialPort {
+
+    func send(colors: [Color]) {
+
+    }
 }

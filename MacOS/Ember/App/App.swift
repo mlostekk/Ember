@@ -14,6 +14,9 @@ class App {
     private let assembler:      Assembler
     private let settingsView:   SettingsView
     private let windowFactory:  WindowFactory
+    private let edgeExtractor:  EdgeExtractor
+    private let edgeSerializer: EdgeSerializer
+    private let serialPort:     SerialPort
     private let settings:       Settings
     private let actions:        Actions
     private var windows:        [WindowPosition: Window] = [:]
@@ -30,6 +33,9 @@ class App {
         self.imageProcessor = assembler.resolve()
         self.settings = assembler.resolve()
         self.actions = assembler.resolve()
+        self.edgeExtractor = assembler.resolve()
+        self.serialPort = assembler.resolve()
+        self.edgeSerializer = assembler.resolve()
         capture = assembler.resolve()
     }
 
@@ -58,9 +64,14 @@ class App {
         windowCancelBag.collect {
             /// Handling the processed image
             imageProcessor.imageStream.sink { [weak self] ciImage in
-                self?.windows.forEach { _, window in
+                guard let self = self else { return }
+                self.windows.forEach { _, window in
                     window.show(image: ciImage)
                 }
+                /// Extract edges, serialize and send them
+                let edges            = self.edgeExtractor.extract(from: ciImage)
+                let serializedColors = self.edgeSerializer.serialize(edges: edges)
+                self.serialPort.send(colors: serializedColors)
             }
             /// Configure capturing & rendering
             capture.pixelBuffer.sink { [weak self] ciImage in
