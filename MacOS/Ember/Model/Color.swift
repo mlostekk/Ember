@@ -6,4 +6,8 @@ struct Color {
     let red:   UInt8
     let green: UInt8
     let blue:  UInt8
+
+    var asArray: [UInt8] {
+        [red, green, blue]
+    }
 }

@@ -60,7 +60,9 @@ class App {
         /// Rendering windows
         windows[.left] = windowFactory.createWindowAt(position: .left, sourceAspectRatio: sourceAspectRatio, targetScreen: targetScreen)
         windows[.right] = windowFactory.createWindowAt(position: .right, sourceAspectRatio: sourceAspectRatio, targetScreen: targetScreen)
-
+        /// start serial port
+        serialPort.open()
+        /// listen to images
         windowCancelBag.collect {
             /// Handling the processed image
             imageProcessor.imageStream.sink { [weak self] ciImage in
@@ -85,6 +87,7 @@ class App {
         windowCancelBag.removeAll()
         windows.forEach { $1.close() }
         windows.removeAll()
+        serialPort.close()
     }
 
     func stop() {

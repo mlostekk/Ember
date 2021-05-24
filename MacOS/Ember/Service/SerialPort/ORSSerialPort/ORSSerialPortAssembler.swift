@@ -7,6 +7,6 @@ protocol ORSSerialPortAssembler: SerialPortAssembler {
 
 extension ORSSerialPortAssembler where Self: Assembler {
     func resolve() -> SerialPort {
-        return ORSSerialPortService()
+        ORSSerialPortService(settings: resolve())
     }
 }

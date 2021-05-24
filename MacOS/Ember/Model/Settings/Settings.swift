@@ -28,4 +28,10 @@ class Settings: Service, ObservableObject {
     @Published var selectedScreen:    NSScreen    = NSScreen.main!
     @Published var sourceAspectRatio: AspectRatio = .aspectRatio16to9
 
+    @Published var ledCountVertical:   Int = 17
+    @Published var ledCountHorizontal: Int = 45
+    @Published var ledSourceInset:     Int = 1
+
+    @Published var serialPort: String = "/dev/cu.usbmodem14301"
+
 }

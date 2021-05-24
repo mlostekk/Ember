@@ -21,6 +21,9 @@ class SimpleEdgeSerializer: EdgeSerializer {
 
     /// Main serialize function
     func serialize(edges: Edges) -> [Color] {
-        fatalError("serialize(edges:) has not been implemented")
+        edges.bottom.reversed() +
+        edges.left.reversed() +
+        edges.top +
+        edges.right
     }
 }
