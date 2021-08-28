@@ -6,20 +6,29 @@ import SwiftUI
 
 class SwiftUISettingsView: SettingsView {
 
-    /// Dependencies
-    private let placementProvider: PlacementProvider
-
     /// The window for the settings view
     private let window:            NSWindow
 
     // The SwiftUI view that provides the window contents.
-    private let contentView = SwiftUISettingsContentView()
+    private let contentView:       SwiftUISettingsContentView
+
+    private var cancelBag = CancelBag()
 
     /// Construction with dependencies
-    init(placementProvider: PlacementProvider,
+    init(imageProcessor: Processor, // TODO i dont like this dependency
          settings: Settings,
          actions: Actions) {
-        self.placementProvider = placementProvider
+        let metalRenderView = MetalRenderView(frame: .zero,
+                                              offset: 0,
+                                              settings: settings,
+                                              resize: true,
+                                              fixNegativeExtent: true)
+        self.contentView = SwiftUISettingsContentView(metalRenderView: metalRenderView)
+        cancelBag.collect {
+            imageProcessor.imageStream.sink { (image: CIImage) -> () in
+                metalRenderView.setImage(image)
+            }
+        }
         // Create the window and set the content view.
         window = NSWindow(
                 contentRect: CGRect(origin: .zero, size: CGSize(width: 400, height: 400)),

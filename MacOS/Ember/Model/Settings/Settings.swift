@@ -32,6 +32,7 @@ class Settings: Service, ObservableObject {
     @Published var ledCountHorizontal: Int = 45
     @Published var ledSourceInset:     Int = 1
 
-    @Published var serialPort: String = "/dev/cu.usbmodem14301"
+    @Published var serialPortEnabled: Bool   = false
+    @Published var serialPort:        String = "/dev/cu.usbmodem14301"
 
 }

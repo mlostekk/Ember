@@ -6,7 +6,15 @@ protocol AVCaptureServiceAssembler: CaptureServiceAssembler {
 }
 
 extension AVCaptureServiceAssembler where Self: Assembler {
+
+    private func createCaptureService() -> AVCaptureService {
+        let initial = AVCaptureService(settings: resolve())
+        register(initial)
+        return initial
+    }
+
     func resolve() -> CaptureService {
-        AVCaptureService(settings: resolve())
+        let service = get(type: AVCaptureService.uniqueKey) as? AVCaptureService
+        return service ?? createCaptureService()
     }
 }

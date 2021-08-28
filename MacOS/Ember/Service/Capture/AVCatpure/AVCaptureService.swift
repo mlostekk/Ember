@@ -5,7 +5,10 @@ import Combine
 import CoreImage
 import AVFoundation
 
-class AVCaptureService: NSObject, CaptureService {
+class AVCaptureService: NSObject, CaptureService, Service {
+
+    /// The unique service key
+    private(set) static var uniqueKey: String = String(describing: AVCaptureService.self)
 
     static let pixelFormatMap: [OSType: String] = [
         kCVPixelFormatType_1Monochrome: "kCVPixelFormatType_1Monochrome",
@@ -56,7 +59,8 @@ class AVCaptureService: NSObject, CaptureService {
 
     private let avCaptureSession = AVCaptureSession()
 
-    let subscription: AnyCancellable
+    /// Subscription for framerate listening
+    private let subscription: AnyCancellable
 
     /// Construction
     init(settings: Settings) {

@@ -38,10 +38,10 @@ class SimpleImageProcessor: Service, Processor {
 
     /// Publish a source image
     func publish(image: CIImage) {
-        contrastBoost.setValue(image, forKey: kCIInputImageKey)
-        contrastBoost.setValue(1.0, forKey: "inputContrast")
-        let contrastImage = contrastBoost.outputImage!
-        let blurred       = contrastImage.applyingGaussianBlur(sigma: settings.blurAmount)
+        //contrastBoost.setValue(image, forKey: kCIInputImageKey)
+        //contrastBoost.setValue(1.0, forKey: "inputContrast")
+        //let contrastImage = contrastBoost.outputImage!
+        let blurred       = image.applyingGaussianBlur(sigma: settings.blurAmount)
         imageSubject.send(blurred)
     }
 

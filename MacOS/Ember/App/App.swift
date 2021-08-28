@@ -60,8 +60,10 @@ class App {
         /// Rendering windows
         windows[.left] = windowFactory.createWindowAt(position: .left, sourceAspectRatio: sourceAspectRatio, targetScreen: targetScreen)
         windows[.right] = windowFactory.createWindowAt(position: .right, sourceAspectRatio: sourceAspectRatio, targetScreen: targetScreen)
-        /// start serial port
-        serialPort.open()
+        /// start serial port only if required
+        if settings.serialPortEnabled {
+            serialPort.open()
+        }
         /// listen to images
         windowCancelBag.collect {
             /// Handling the processed image
@@ -71,9 +73,11 @@ class App {
                     window.show(image: ciImage)
                 }
                 /// Extract edges, serialize and send them
-                let edges            = self.edgeExtractor.extract(from: ciImage)
-                let serializedColors = self.edgeSerializer.serialize(edges: edges)
-                self.serialPort.send(colors: serializedColors)
+                if self.settings.serialPortEnabled {
+                    let edges            = self.edgeExtractor.extract(from: ciImage)
+                    let serializedColors = self.edgeSerializer.serialize(edges: edges)
+                    self.serialPort.send(colors: serializedColors)
+                }
             }
             /// Configure capturing & rendering
             capture.pixelBuffer.sink { [weak self] ciImage in
@@ -87,7 +91,9 @@ class App {
         windowCancelBag.removeAll()
         windows.forEach { $1.close() }
         windows.removeAll()
-        serialPort.close()
+        if settings.serialPortEnabled {
+            serialPort.close()
+        }
     }
 
     func stop() {
