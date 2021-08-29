@@ -1,48 +1,18 @@
 // Copyright (c) 2021 Nomad5. All rights reserved.
 
-import Foundation
-import CoreImage
 import Combine
+import CoreImage
+
+typealias ImageStream = AnyPublisher<CIImage, Never>
 
 protocol Processor {
-    /// Publish a source image
-    func publish(image: CIImage)
+    /// Process the source image
+    func process(image: CIImage)
 
-    /// The result image
-    var imageStream: AnyPublisher<CIImage, Never> { get }
-}
-
-class SimpleImageProcessor: Service, Processor {
-
-    /// The unique service key
-    private(set) static var uniqueKey: String = String(describing: SimpleImageProcessor.self)
-
-    /// The internal subject
-    private let imageSubject  = PassthroughSubject<CIImage, Never>()
-
-    /// Effects
-    private let contrastBoost = CIFilter(name: "CIColorControls")!
-
-    /// Injected dependencies
-    private let settings: Settings
-
-    /// The image stream exposed to consumers
-    var imageStream: AnyPublisher<CIImage, Never> {
-        imageSubject.eraseToAnyPublisher()
-    }
-
-    /// Construction
-    init(settings: Settings) {
-        self.settings = settings
-    }
-
-    /// Publish a source image
-    func publish(image: CIImage) {
-        //contrastBoost.setValue(image, forKey: kCIInputImageKey)
-        //contrastBoost.setValue(1.0, forKey: "inputContrast")
-        //let contrastImage = contrastBoost.outputImage!
-        let blurred       = image.applyingGaussianBlur(sigma: settings.blurAmount)
-        imageSubject.send(blurred)
-    }
-
+    /// The result image steam for the full processed image
+    var imageStreamFull:  ImageStream { get }
+    /// The result image steam for the left processed image
+    var imageStreamLeft:  ImageStream { get }
+    /// The result image steam for the right processed image
+    var imageStreamRight: ImageStream { get }
 }

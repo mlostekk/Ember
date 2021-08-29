@@ -65,6 +65,12 @@ struct SwiftUISettingsContentView: View {
                 Slider(value: $settings.blurAmount, in: 0...100)
                 Divider()
             }
+            // scale
+            Group {
+                Text("Scaling: \(settings.scale)")
+                Slider(value: $settings.scale, in: 1...2)
+                Divider()
+            }
             // framerate
             Group {
                 Text("Framerate \(Int(settings.frameRate))")

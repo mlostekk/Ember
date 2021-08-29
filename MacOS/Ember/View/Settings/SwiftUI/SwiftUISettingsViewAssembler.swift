@@ -8,8 +8,7 @@ protocol SwiftUISettingsViewAssembler {
 
 extension SwiftUISettingsViewAssembler where Self: Assembler {
     func resolve() -> SettingsView {
-        SwiftUISettingsView(imageProcessor: resolve(),
-                            settings: resolve(),
+        SwiftUISettingsView(settings: resolve(),
                             actions: resolve())
     }
 }

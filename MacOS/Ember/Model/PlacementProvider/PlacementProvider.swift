@@ -4,9 +4,10 @@ import Foundation
 import Cocoa
 
 struct Placement {
-    let source: CGRect
-    let target: CGRect
-    let offset: CGFloat
+    let source:   CGRect
+    let target:   CGRect
+    let offset:   CGFloat
+    let barWidth: CGFloat
 }
 
 /// This service returns coordinates for the given window type
@@ -35,16 +36,18 @@ class StaticMainDisplayPlacementProvider: PlacementProvider {
         switch type {
             case .left:
                 return Placement(source: CGRect(origin: CGPoint(x: verticalBlackBarWidth, y: 0),
-                                              size: verticalBlackBarSize),
-                               target: CGRect(origin: .zero,
-                                              size: verticalBlackBarSize),
-                               offset: (-verticalBlackBarWidth) * targetScreen.backingScaleFactor)
+                                                size: verticalBlackBarSize),
+                                 target: CGRect(origin: .zero,
+                                                size: verticalBlackBarSize),
+                                 offset: (-verticalBlackBarWidth) * targetScreen.backingScaleFactor,
+                                 barWidth: verticalBlackBarWidth)
             case .right:
-                return Placement(source: CGRect(origin: CGPoint(x: screenWidth - verticalBlackBarWidth, y: 0),
-                                              size: verticalBlackBarSize),
-                               target: CGRect(origin: CGPoint(x: screenWidth - verticalBlackBarWidth, y: 0),
-                                              size: verticalBlackBarSize),
-                               offset: (-screenWidth + verticalBlackBarWidth * 2) * targetScreen.backingScaleFactor)
+                return Placement(source: CGRect(origin: CGPoint(x: screenWidth - verticalBlackBarWidth * 2, y: 0),
+                                                size: verticalBlackBarSize),
+                                 target: CGRect(origin: CGPoint(x: screenWidth - verticalBlackBarWidth, y: 0),
+                                                size: verticalBlackBarSize),
+                                 offset: (-screenWidth + verticalBlackBarWidth * 2) * targetScreen.backingScaleFactor,
+                                 barWidth: verticalBlackBarWidth)
         }
     }
 }

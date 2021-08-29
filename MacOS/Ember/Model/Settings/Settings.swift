@@ -23,10 +23,12 @@ class Settings: Service, ObservableObject {
     /// The unique service key
     private(set) static var uniqueKey: String = String(describing: Settings.self)
 
-    @Published var blurAmount:        Double      = 10.0
-    @Published var frameRate:         Double      = 30
+    @Published var blurAmount: Double = 10.0
+    @Published var scale:      Double = 1.1
+
+    @Published var frameRate:         Double      = 60
     @Published var selectedScreen:    NSScreen    = NSScreen.main!
-    @Published var sourceAspectRatio: AspectRatio = .aspectRatio16to9
+    @Published var sourceAspectRatio: AspectRatio = .aspectRatio4to3
 
     @Published var ledCountVertical:   Int = 17
     @Published var ledCountHorizontal: Int = 45

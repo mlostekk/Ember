@@ -9,39 +9,43 @@ import Combine
 class App {
 
     /// Dependencies
-    private let capture:        CaptureService
-    private let imageProcessor: Processor
-    private let assembler:      Assembler
-    private let settingsView:   SettingsView
-    private let windowFactory:  WindowFactory
-    private let edgeExtractor:  EdgeExtractor
-    private let edgeSerializer: EdgeSerializer
-    private let serialPort:     SerialPort
-    private let settings:       Settings
-    private let actions:        Actions
-    private var windows:        [WindowPosition: Window] = [:]
+    private let capture:           CaptureService
+    private let processorFactory:  ProcessorFactory
+    private let assembler:         Assembler
+    private let settingsView:      SettingsView
+    private let windowFactory:     WindowFactory
+    private let edgeExtractor:     EdgeExtractor
+    private let edgeSerializer:    EdgeSerializer
+    private let serialPort:        SerialPort
+    private let settings:          Settings
+    private let actions:           Actions
+    private let placementProvider: PlacementProvider
+    private var windows:           [WindowPosition: Window] = [:]
+    private var processor:         Processor?
 
     /// The cancel bag
-    private var globalCancelBag                          = CancelBag()
-    private var windowCancelBag                          = CancelBag()
+    private var globalCancelBag                             = CancelBag()
+    private var windowCancelBag                             = CancelBag()
 
     /// Construction with dependencies
     init(with assembler: Assembler) {
         self.assembler = assembler
         self.settingsView = assembler.resolve()
         self.windowFactory = assembler.resolve()
-        self.imageProcessor = assembler.resolve()
+        self.processorFactory = assembler.resolve()
         self.settings = assembler.resolve()
         self.actions = assembler.resolve()
         self.edgeExtractor = assembler.resolve()
         self.serialPort = assembler.resolve()
         self.edgeSerializer = assembler.resolve()
+        self.placementProvider = assembler.resolve()
         capture = assembler.resolve()
     }
 
     func start() {
-        /// Settings
+        // settings
         settingsView.show()
+        // global start / stop behavior
         globalCancelBag.collect {
             /// Subscribe to start button
             actions.startRenderingStream.sink { [weak self] in
@@ -57,21 +61,40 @@ class App {
     }
 
     private func showWindows(sourceAspectRatio: AspectRatio, targetScreen: NSScreen) {
-        /// Rendering windows
+        // Rendering windows
         windows[.left] = windowFactory.createWindowAt(position: .left, sourceAspectRatio: sourceAspectRatio, targetScreen: targetScreen)
         windows[.right] = windowFactory.createWindowAt(position: .right, sourceAspectRatio: sourceAspectRatio, targetScreen: targetScreen)
+        // The processor
+        let placementLeft  = placementProvider.getPlacement(for: .left, sourceAspectRatio: sourceAspectRatio, targetScreen: targetScreen)
+        let placementRight = placementProvider.getPlacement(for: .right, sourceAspectRatio: sourceAspectRatio, targetScreen: targetScreen)
+        assert(placementLeft.barWidth == placementRight.barWidth)
+        processor = processorFactory.createProcessorWith(barWidth: placementLeft.barWidth)
+        guard let processor = processor else {
+            Log.e("Processor could not be created")
+            return
+        }
+        // pass processor to settings for preview view
+        settingsView.attach(imageStream: processor.imageStreamFull)
+
         /// start serial port only if required
         if settings.serialPortEnabled {
             serialPort.open()
         }
         /// listen to images
         windowCancelBag.collect {
-            /// Handling the processed image
-            imageProcessor.imageStream.sink { [weak self] ciImage in
+            /// Handling the left processed image
+            processor.imageStreamLeft.sink { [weak self] ciImage in
                 guard let self = self else { return }
-                self.windows.forEach { _, window in
-                    window.show(image: ciImage)
-                }
+                self.windows[.left]?.show(image: ciImage)
+            }
+            /// Handling the right processed image
+            processor.imageStreamRight.sink { [weak self] ciImage in
+                guard let self = self else { return }
+                self.windows[.right]?.show(image: ciImage)
+            }
+            /// Handling the full image
+            processor.imageStreamFull.sink { [weak self] ciImage in
+                guard let self = self else { return }
                 /// Extract edges, serialize and send them
                 if self.settings.serialPortEnabled {
                     let edges            = self.edgeExtractor.extract(from: ciImage)
@@ -80,8 +103,8 @@ class App {
                 }
             }
             /// Configure capturing & rendering
-            capture.pixelBuffer.sink { [weak self] ciImage in
-                self?.imageProcessor.publish(image: ciImage)
+            capture.pixelBuffer.sink { ciImage in
+                processor.process(image: ciImage)
             }
         }
         capture.start()
