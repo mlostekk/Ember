@@ -28,9 +28,12 @@ class SimpleProcessor: Service, Processor {
         imageSubjectLeft.eraseToAnyPublisher()
     }
 
+    /// Additional static offset to bar width to avoid red borders
+    private let staticBarWidthOffset: CGFloat = 1
+
     /// Injected dependencies
-    private let settings: Settings
-    private let barWidth: CGFloat
+    private let settings:             Settings
+    private let barWidth:             CGFloat
 
     /// Construction
     init(settings: Settings, barWidth: CGFloat) {
@@ -43,7 +46,7 @@ class SimpleProcessor: Service, Processor {
         // 0. VARS
         let scale         = CGFloat(settings.scale)
         let blur          = settings.blurAmount
-        let barWidth      = barWidth * settings.selectedScreen.backingScaleFactor
+        let barWidth      = (barWidth + staticBarWidthOffset) * settings.selectedScreen.backingScaleFactor
 
         // 2. SCALE
         let scaled        = image.scale(aspectRatio: 1, scale: scale)
