@@ -30,10 +30,7 @@ class MetalRenderView: MTKView, RenderView {
     }
 
     /// Construction with config
-    init(device: MTLDevice? = MTLCreateSystemDefaultDevice(),
-         frame: CGRect,
-         settings: Settings,
-         resize: Bool = false) {
+    init(device: MTLDevice? = MTLCreateSystemDefaultDevice(), frame: CGRect, settings: Settings, resize: Bool = false) {
         self.resize = resize
         self.settings = settings
         super.init(frame: frame, device: device)
@@ -53,7 +50,7 @@ class MetalRenderView: MTKView, RenderView {
 
     /// Destruction
     deinit {
-        Log.e("MetalRenderView destroyed")
+        Log.d("MetalRenderView destroyed")
     }
 
     /// Set the image and trigger draw
@@ -72,12 +69,11 @@ class MetalRenderView: MTKView, RenderView {
         let resizedImage: CIImage
         if resize {
             // scale down image
-            let targetSize  = CGSize(width: rect.size.width * scalingFactor, height: rect.size.height * scalingFactor)
-            let scale       = targetSize.height / input.extent.height
-            let aspectRatio = targetSize.width / (input.extent.width * scale)
+            let targetSize = CGSize(width: rect.size.width * scalingFactor, height: rect.size.height * scalingFactor)
+            let scale      = targetSize.height / input.extent.height
             resizeFilter.setValue(input, forKey: kCIInputImageKey)
             resizeFilter.setValue(scale, forKey: kCIInputScaleKey)
-            resizeFilter.setValue(aspectRatio, forKey: kCIInputAspectRatioKey)
+            resizeFilter.setValue(1, forKey: kCIInputAspectRatioKey)
             guard let resized = resizeFilter.outputImage else {
                 Log.e("Could not resize image")
                 return

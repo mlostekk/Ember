@@ -20,6 +20,18 @@ struct AspectRatio: CustomStringConvertible, Hashable {
 
 class Settings: Service, ObservableObject {
 
+    enum PreviewSource: String, Equatable, CaseIterable {
+        case input
+        case scaled
+        case blurred
+        case left
+        case right
+
+        var localizedName: String {
+            rawValue
+        }
+    }
+
     /// The unique service key
     private(set) static var uniqueKey: String = String(describing: Settings.self)
 
@@ -36,5 +48,7 @@ class Settings: Service, ObservableObject {
 
     @Published var serialPortEnabled: Bool   = false
     @Published var serialPort:        String = "/dev/cu.usbmodem14301"
+
+    @Published var previewSource: PreviewSource = .input
 
 }

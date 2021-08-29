@@ -27,10 +27,11 @@ struct SettingsPreviewContentView: NSViewRepresentable {
 
 struct SwiftUISettingsContentView: View {
 
-    @EnvironmentObject var settings:        Settings
-    @EnvironmentObject var actions:         Actions
-    @State var             isRunning:       Bool = false
-    let                    metalRenderView: MetalRenderView
+    @EnvironmentObject var settings:         Settings
+    @EnvironmentObject var actions:          Actions
+    @State var             isRunning:        Bool                   = false
+    @State var             previewSelection: Settings.PreviewSource = .input
+    let                    metalRenderView:  MetalRenderView
 
     var body: some View {
         Group {
@@ -79,6 +80,13 @@ struct SwiftUISettingsContentView: View {
             }
             // preview
             Group {
+                Form {
+                    Picker("Preview source", selection: $settings.previewSource) {
+                        ForEach(Settings.PreviewSource.allCases, id: \.localizedName) { value in
+                            Text(value.localizedName).tag(value)
+                        }
+                    }
+                }
                 SettingsPreviewContentView(with: metalRenderView)
                         .frame(height: 200.0)
                         .frame(width: 200.0 * (settings.sourceAspectRatio.ratio))
