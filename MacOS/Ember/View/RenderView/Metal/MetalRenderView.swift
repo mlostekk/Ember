@@ -59,6 +59,11 @@ class MetalRenderView: MTKView, RenderView {
         needsDisplay = true
     }
 
+    /// Accept mouse clicks
+    override func acceptsFirstMouse(for event: NSEvent?) -> Bool {
+        true
+    }
+
     /// Draw the actual image
     override func draw(_ rect: CGRect) {
         guard let input = imageToDisplay,

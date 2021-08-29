@@ -10,6 +10,7 @@ extension NSWindowPanelAssembler where Self: Assembler {
 
     func resolve() -> WindowFactory {
         NSWindowPanelFactory(placementProvider: resolve(),
-                             renderViewFactory: resolve())
+                             renderViewFactory: resolve(),
+                             actions: resolve())
     }
 }

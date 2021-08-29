@@ -20,6 +20,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         app.start()
     }
 
+    /// User clicked on the icon in the dock
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        app.openSettingsView()
+        return true
+    }
+
     /// Application end
     func applicationWillTerminate(_ aNotification: Notification) {
         app.stop()

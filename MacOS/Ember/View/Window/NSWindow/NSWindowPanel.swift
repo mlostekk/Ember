@@ -6,14 +6,18 @@ import MetalKit
 class NSWindowPanel: Window {
 
     /// The window
-    let window:     NSWindow
+    private let window:     NSWindow
 
-    /// The main view
-    let renderView: RenderView
+    /// Injections
+    private let renderView: RenderView
+    private let actions:    Actions
 
     /// Create the window
-    init(renderView: RenderView, at rect: CGRect) {
+    init(renderView: RenderView,
+         at rect: CGRect,
+         actions: Actions) {
         self.renderView = renderView
+        self.actions = actions
         window = NSWindow(contentRect: rect,
                           styleMask: [.nonactivatingPanel, .borderless],
                           backing: .buffered,
@@ -24,6 +28,16 @@ class NSWindowPanel: Window {
         window.contentView = renderView
         window.orderFrontRegardless()
         window.isReleasedWhenClosed = false
+        // configure triple click
+        let tripleClick = NSClickGestureRecognizer(target: self, action: #selector(handleTripleClick))
+        tripleClick.numberOfClicksRequired = 3
+        window.contentView?.addGestureRecognizer(tripleClick)
+    }
+
+    /// Handle triple click
+    @objc func handleTripleClick() {
+        Log.i("Triple click executed")
+        actions.openSettingsWindow.send(())
     }
 
     /// Destruction

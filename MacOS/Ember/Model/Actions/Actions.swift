@@ -21,4 +21,11 @@ class Actions: Service, ObservableObject {
     }
 
     @Published private(set) var stopRenderingSubject = PassthroughSubject<Void, Never>()
+
+    /// Open settings window stream
+    var openSettingsWindowStream: AnyPublisher<Void, Never> {
+        openSettingsWindow.eraseToAnyPublisher()
+    }
+
+    @Published private(set) var openSettingsWindow = PassthroughSubject<Void, Never>()
 }

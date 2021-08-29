@@ -44,7 +44,7 @@ class App {
 
     func start() {
         // settings
-        settingsView.show()
+        openSettingsView()
         // global start / stop behavior
         globalCancelBag.collect {
             /// Subscribe to start button
@@ -57,9 +57,19 @@ class App {
                 guard let self = self else { return }
                 self.killWindows()
             }
+            /// Settings
+            actions.openSettingsWindowStream.sink { [weak self] in
+                self?.openSettingsView()
+            }
         }
     }
 
+    /// Show settings
+    func openSettingsView() {
+        settingsView.show()
+    }
+
+    /// Show panel windows left and right
     private func showWindows(sourceAspectRatio: AspectRatio, targetScreen: NSScreen) {
         // Rendering windows
         windows[.left] = windowFactory.createWindowAt(position: .left, sourceAspectRatio: sourceAspectRatio, targetScreen: targetScreen)
