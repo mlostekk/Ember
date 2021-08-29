@@ -50,14 +50,20 @@ struct SwiftUISettingsContentView: View {
             }
             // start / stop button
             Group {
-                Button(isRunning ? "Stop" : "Start") {
+                Button(action: {
                     if isRunning {
                         actions.stopRenderingSubject.send(())
                     } else {
                         actions.startRenderingSubject.send(())
                     }
                     isRunning = !isRunning
-                }
+                }) {
+                    Text(isRunning ? "Stop" : "Start")
+                            .font(.system(size: 25))
+                            .padding()
+                            .background(RoundedRectangle(cornerRadius: 8).foregroundColor(.blue))
+                            .frame(width: 100)
+                }.buttonStyle(PlainButtonStyle())
                 Divider()
             }
             // blur amount
