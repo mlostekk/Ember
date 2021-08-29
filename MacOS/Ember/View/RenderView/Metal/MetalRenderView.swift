@@ -7,9 +7,9 @@ import MetalPerformanceShaders
 class MetalRenderView: MTKView, RenderView {
 
     /// The image that should be displayed next.
-    private var imageToDisplay:    CIImage?
-    private let settings:          Settings
-    private let resize:            Bool
+    private var imageToDisplay: CIImage?
+    private let settings:       Settings
+    private let resize:         Bool
 
     /// Resize filter
     private let resizeFilter = CIFilter(name: "CILanczosScaleTransform")!
