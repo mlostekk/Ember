@@ -84,20 +84,22 @@ struct SwiftUISettingsContentView: View {
                 Slider(value: $settings.frameRate, in: 1...100)
                 Divider()
             }
-            // preview
-            Group {
-                Form {
-                    Picker("Preview source", selection: $settings.previewSource) {
-                        ForEach(Settings.PreviewSource.allCases, id: \.localizedName) { value in
-                            Text(value.localizedName).tag(value)
+            #if PREVIEW_IN_SETTINGS
+                // preview
+                Group {
+                    Form {
+                        Picker("Preview source", selection: $settings.previewSource) {
+                            ForEach(Settings.PreviewSource.allCases, id: \.localizedName) { value in
+                                Text(value.localizedName).tag(value)
+                            }
                         }
                     }
+                    SettingsPreviewContentView(with: metalRenderView)
+                            .frame(height: 200.0)
+                            .frame(width: 200.0 * (settings.sourceAspectRatio.ratio))
+                    Divider()
                 }
-                SettingsPreviewContentView(with: metalRenderView)
-                        .frame(height: 200.0)
-                        .frame(width: 200.0 * (settings.sourceAspectRatio.ratio))
-                Divider()
-            }
+            #endif
             // serial port
             Group {
                 Text("Serial port settings")
