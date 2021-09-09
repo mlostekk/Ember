@@ -99,15 +99,14 @@ struct SwiftUISettingsContentView: View {
                             .frame(width: 200.0 * (settings.sourceAspectRatio.ratio))
                     Divider()
                 }
+                // serial port
+                Group {
+                    Text("Serial port settings")
+                    Toggle(isOn: $settings.serialPortEnabled) {
+                        Text("Serial port enabled")
+                    }.disabled(true)
+                }
             #endif
-            // serial port
-            Group {
-                Text("Serial port settings")
-                Toggle(isOn: $settings.serialPortEnabled) {
-                    Text("Serial port enabled")
-                }.disabled(true)
-            }
-
         }.padding()
     }
 }
