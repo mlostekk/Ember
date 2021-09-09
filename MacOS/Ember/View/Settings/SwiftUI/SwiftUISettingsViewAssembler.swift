@@ -2,7 +2,7 @@
 
 import Foundation
 
-protocol SwiftUISettingsViewAssembler {
+protocol SwiftUISettingsViewAssembler: SettingsViewAssembler {
     func resolve() -> SettingsView
 }
 
