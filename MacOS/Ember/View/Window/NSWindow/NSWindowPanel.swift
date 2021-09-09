@@ -1,7 +1,6 @@
 // Copyright (c) 2021 Nomad5. All rights reserved.
 
 import Cocoa
-import MetalKit
 
 class NSWindowPanel: Window {
 
@@ -18,10 +17,10 @@ class NSWindowPanel: Window {
          actions: Actions) {
         self.renderView = renderView
         self.actions = actions
-        window = NSWindow(contentRect: rect,
-                          styleMask: [.nonactivatingPanel, .borderless],
-                          backing: .buffered,
-                          defer: true)
+        window = NSPanel(contentRect: rect,
+                         styleMask: [.nonactivatingPanel, .borderless],
+                         backing: .buffered,
+                         defer: true)
 
         window.level = .statusBar // .mainMenu
         window.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
