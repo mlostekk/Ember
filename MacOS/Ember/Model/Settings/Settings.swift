@@ -40,7 +40,7 @@ class Settings: Service, ObservableObject {
 
     @Published var frameRate:         Double      = 60
     @Published var selectedScreen:    NSScreen    = NSScreen.main!
-    @Published var sourceAspectRatio: AspectRatio = .aspectRatio4to3
+    @Published var sourceAspectRatio: AspectRatio = .aspectRatio16to9
 
     @Published var ledCountVertical:   Int = 17
     @Published var ledCountHorizontal: Int = 45
