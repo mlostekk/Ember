@@ -43,7 +43,7 @@ struct SwiftUISettingsContentView: View {
                     }
                 }.disabled(isRunning)
                 Picker("Choose the aspect ratio", selection: $settings.sourceAspectRatio) {
-                    ForEach(Globals.availableAspectRatios, id: \.self) { aspectRatio in
+                    ForEach(Globals.availableAspectRatios(for: settings.selectedScreen.aspectRatio), id: \.self) { aspectRatio in
                         Text(aspectRatio.description)
                     }
                 }.disabled(isRunning)

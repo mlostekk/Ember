@@ -11,6 +11,7 @@ struct AspectRatio: CustomStringConvertible, Hashable {
         width / height
     }
     static let aspectRatio16to9 = AspectRatio(width: 16, height: 9)
+    static let aspectRatio16to10 = AspectRatio(width: 16, height: 10)
     static let aspectRatio4to3  = AspectRatio(width: 4, height: 3)
 
     var description: String {
@@ -40,7 +41,7 @@ class Settings: Service, ObservableObject {
 
     @Published var frameRate:         Double      = 60
     @Published var selectedScreen:    NSScreen    = NSScreen.main!
-    @Published var sourceAspectRatio: AspectRatio = .aspectRatio16to9
+    @Published var sourceAspectRatio: AspectRatio = .aspectRatio4to3
 
     @Published var ledCountVertical:   Int = 17
     @Published var ledCountHorizontal: Int = 45

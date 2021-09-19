@@ -55,7 +55,7 @@
                                     </items>
                                 </menu>
                             </menuItem>
-                            <menuItem title="File" enabled="NO" id="dMs-cI-mzQ">
+                            <menuItem title="File" hidden="YES" enabled="NO" id="dMs-cI-mzQ">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="File" id="bib-Uj-vzu">
                                     <items>
@@ -118,7 +118,7 @@
                                     </items>
                                 </menu>
                             </menuItem>
-                            <menuItem title="Edit" enabled="NO" id="5QF-Oa-p0T">
+                            <menuItem title="Edit" hidden="YES" enabled="NO" id="5QF-Oa-p0T">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Edit" id="W48-6f-4Dl">
                                     <items>
@@ -337,7 +337,7 @@
                                     </items>
                                 </menu>
                             </menuItem>
-                            <menuItem title="Format" enabled="NO" id="jxT-CU-nIS">
+                            <menuItem title="Format" hidden="YES" enabled="NO" id="jxT-CU-nIS">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Format" id="GEO-Iw-cKr">
                                     <items>
@@ -599,7 +599,7 @@
                                     </items>
                                 </menu>
                             </menuItem>
-                            <menuItem title="View" enabled="NO" id="H8h-7b-M4v">
+                            <menuItem title="View" hidden="YES" enabled="NO" id="H8h-7b-M4v">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="View" id="HyV-fh-RgO">
                                     <items>
@@ -631,23 +631,28 @@
                                     </items>
                                 </menu>
                             </menuItem>
-                            <menuItem title="Window" enabled="NO" id="aUF-d1-5bR">
+                            <menuItem title="Window" id="aUF-d1-5bR">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Window" systemMenu="window" id="Td7-aD-5lo">
                                     <items>
-                                        <menuItem title="Minimize" enabled="NO" keyEquivalent="m" id="OY7-WF-poV">
+                                        <menuItem title="Minimize" keyEquivalent="m" id="OY7-WF-poV">
                                             <connections>
                                                 <action selector="performMiniaturize:" target="Ady-hI-5gd" id="VwT-WD-YPe"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Zoom" enabled="NO" id="R4o-n2-Eq4">
+                                        <menuItem title="Zoom" id="R4o-n2-Eq4">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="performZoom:" target="Ady-hI-5gd" id="DIl-cC-cCs"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem isSeparatorItem="YES" id="eu3-7i-yIM"/>
-                                        <menuItem title="Bring All to Front" enabled="NO" id="LE2-aR-0XJ">
+                                        <menuItem isSeparatorItem="YES" enabled="YES" id="eu3-7i-yIM"/>
+                                        <menuItem title="Restore Main Window" keyEquivalent="r" id="xnp-oD-Sz3" userLabel="Restore Main Window">
+                                            <connections>
+                                                <action selector="onMenuRestoreMainWindow:" target="Voe-Tx-rLC" id="zE3-9W-lAF"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Bring All to Front" id="LE2-aR-0XJ">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="arrangeInFront:" target="Ady-hI-5gd" id="DRN-fu-gQh"/>

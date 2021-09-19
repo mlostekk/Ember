@@ -31,5 +31,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         app.stop()
     }
 
+    /// Restore main window
+    @IBAction func onMenuRestoreMainWindow(_ sender: Any) {
+        app.openSettingsView()
+    }
 }
 
